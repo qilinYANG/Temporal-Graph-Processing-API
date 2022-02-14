@@ -2,7 +2,7 @@
 
 # 2
 
-# 3 Expectation
+# 3) Expectations
 
 The expected effect of the proposed solution is an unbounded/bounded temporal graph processing library that are able to do the following:
 - Efficiently maintain state/snapshot of an ever-changing graph
