@@ -8,6 +8,7 @@ _What is the basic approach, method, idea or tool that’s being suggested to so
 - Use Apache Flink Stateful Function to handle queries and graph operations (Java)<br />
 - Docker (decide later if we need to use Docker)<br />
 - Kafka for event ingress and egress (decide later)<br />
+
 **Basic approach**<br />
 - We will implement a statefun application consisting of several stateful functions that perform specific tasks (graph updates or temporal queries) based on incoming events.<br />
 **For first half of the project, we’ll focus on:<br />**
