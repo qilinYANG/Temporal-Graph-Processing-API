@@ -30,7 +30,13 @@ The expected effect of the proposed solution is an unbounded/bounded temporal gr
 In conclusion, our solution is a working API library that helps developers to process unbounded temporal graph efficiently by utilizing Flink stateful functions.
 The alternative approaches we are considering is implementing library after analyzing other temporal graph processing libraries and focus on one problem/flaw of those libraries and improve upon it.
 
-# 4
+# 4) Experimental Plan
+
+Series of steps required to evaluate the correctness and efficacy of the proposed design. Including, but not limited to:
+- Using Docker for environment simulations and setup.
+- Building an array of unit tests for testing each module under different circumstances/workloads, and comparing actual and predicted results after running them through the API.
+- Datasets: Yelp/Snap provided in the project description (starting with the mathoverflow dataset).
+- Measuring the performance difference between embedded functions and remote functions.
 
 # 5) Success Indicators  
 __Outcome__:  
@@ -46,4 +52,13 @@ __Milestones__:
 6. Complete functions that handle queries and functions that perform advanced operations on temporal graph based on the queries.
 7. Run experiments/tests and gather performance data
 8. Make adjustments/experiments based on experiments conducted before
-# 6
+
+# 6) Tasks
+1. API Architecture
+    - Configuration files (module.yaml) for specifying API endpoints and ingress/egress
+    - Diagram of the whole architecture (tools & modules)
+    - Docker Image (environment setup)
+2. Data ingestion Function
+3. Graph update (addition, delete, modification) functions
+4. Graph query functions
+
