@@ -1,4 +1,10 @@
-# 1
+# 1) Problem Statement
+**There are a few problems we are trying to solve**:
+
+* The ability to efficiently run queries(e.g number of friends a user has that are also friends with each other) and updates (edge additions and deletions) upon an evolving graph (eg. social graph, where new friends are constantly being added)
+* Adding support for cross-graph analysis through the creation of this suite of functions that can serve as an API for evolving graphs
+    * This is an important problem because graphs are extremely relevant in our increasingly socially connected world, and having this API would allow us to deduce relationships between these social networks easily and extract useful information to perform tasks like content recommendations
+* This problem will benefit anybody who maintains large graphs where data is ever-changing and analytics on specific instances of the graph is required
 
 # 2) Solution
 **Proposed Solution.**
