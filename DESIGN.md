@@ -51,7 +51,7 @@ Series of steps required to evaluate the correctness and efficacy of the propose
 
 # 5) Success Indicators
 __Outcome__:
-The final outcome of this project is a set of Flink stateful functions that are able to effieicntly process temporal graphs, perform graph updates and modifications, and also run specific graph algorithms to produce analytical results based on user queries.
+The final outcome of this project is a set of Flink stateful functions that are able to effieicntly process temporal graphs, perform graph updates and modifications, and also run specific graph algorithms to produce analytical results based on user queries.  
 __Milestones__:
 1. Overall Architecture design (what type of I/O components to use and the overall dataflow within our statefun application) => will produce an architecture diagram
 2. Complete skeleton code(abstractions/interface/customized data types). Implement the architecture(write configuration in module.yaml and simple web server for serving the fucntions)
