@@ -24,11 +24,20 @@ _What is the basic approach, method, idea or tool that’s being suggested to so
 # 3) Expectations
 
 The expected effect of the proposed solution is an unbounded/bounded temporal graph processing library that are able to do the following:
-- Efficiently maintain state/snapshot of an ever-changing graph
-- Able to update unbounded temporal graphs
-- Able do temporal graph queries
-In conclusion, our solution is a working API library that helps developers to process unbounded temporal graph efficiently by utilizing Flink stateful functions.
-The alternative approaches we are considering is implementing library after analyzing other temporal graph processing libraries and focus on one problem/flaw of those libraries and improve upon it.
+
+1. Able to update bounded/unbounded directed, temporal graphs
+ - Add new node to the graph
+ - Modifying graph structure after adding the new node
+ - Search for specific node on the graph (eg. Did user u comment on user v’s question)
+2. Able to query bounded/unbounded directed, temporal graphs. For example:
+ - How many outgoing edges does node v have?
+ - How many incoming edges does node v have?
+ - How many incoming edges does node v have within a specific time period?
+ - At time t, how many nodes have x edges?
+ - At time t, what is the maximum number of edges a node has?
+3. Able to give edges attribute (an abstract data type for edge)
+4. Support graph algorithms (bfs, dfs, shortest path, topological sorting) to be used for graph queries
+
 
 # 4) Experimental Plan
 
@@ -38,12 +47,12 @@ Series of steps required to evaluate the correctness and efficacy of the propose
 - Datasets: Yelp/Snap provided in the project description (starting with the mathoverflow dataset).
 - Measuring the performance difference between embedded functions and remote functions.
 
-# 5) Success Indicators  
-__Outcome__:  
-The final outcome of this project is an usable API library built on top of Flink Stateful functions that is able to effieicntly process temporal graphs, perform graph updates and modifications, and also run specific graph algorithms to produce analytical results based on user queries.  
-__Success Measurement__:  
-Our primary goal is to implement a working API library. We will also perform unit test on each function to ensure correctness and run simulations if possible. We also plan to compare performance difference among different stateful function architectures(e.g. embedded and remote functions).   
-__Milestones__:  
+# 5) Success Indicators
+__Outcome__:
+The final outcome of this project is an usable API library built on top of Flink Stateful functions that is able to effieicntly process temporal graphs, perform graph updates and modifications, and also run specific graph algorithms to produce analytical results based on user queries.
+__Success Measurement__:
+Our primary goal is to implement a working API library. We will also perform unit test on each function to ensure correctness and run simulations if possible. We also plan to compare performance difference among different stateful function architectures(e.g. embedded and remote functions).
+__Milestones__:
 1. Overall Architecture design (what type of I/O components to use and the overall dataflow within our statefun application) => will produce an architecture diagram
 2. Complete skeleton code(abstractions/interface/customized data types). Implement the architecture(write configuration in module.yaml and simple web server for serving the fucntions)
 3. Create unit tests to measure the correctness/performance of our statefun application (__Important__: leave comments on what the function does and its parameters)
@@ -54,11 +63,22 @@ __Milestones__:
 8. Make adjustments/experiments based on experiments conducted before
 
 # 6) Tasks
-1. API Architecture
-    - Configuration files (module.yaml) for specifying API endpoints and ingress/egress
-    - Diagram of the whole architecture (tools & modules)
-    - Docker Image (environment setup)
-2. Data ingestion Function
-3. Graph update (addition, delete, modification) functions
-4. Graph query functions
+Tasks:
+1. API Architecture Part 1 (first week)
+  - Configuration files (module.yaml) for specifying API endpoints and ingress/egress
+  - Diagram of the whole architecture (tools & modules) (By Thur 2.17.22) [Aaron]
+  - Docker image (set up the environment) [Ardarsh]
+2. API Architecture Part 2 (second week)
+  - Interfacing our functions to simplify development (graph update, graph query, and data transformation functions) [Divide tasks]
+  - Graph representation (how to represent and store the temporal graphs) [Do together]
+
+All of the tasks above are required to be done before starting the rest:
+3. Data ingestion Function (2): (by March 15th)
+  - Read data from file and process it in Flink [Qilin]
+4. Graph updates functions (2)
+  - Addition [Touch]
+  - Delete [Mike]
+  - Modification [Ardarsh]
+5. Graph queries functions (3) [Aaron]
+  - Dataset: https://snap.stanford.edu/data/sx-mathoverflow.html
 
