@@ -42,24 +42,24 @@ The expected effect of the proposed solution is an unbounded/bounded temporal gr
 # 4) Experimental Plan
 
 Series of steps required to evaluate the correctness and efficacy of the proposed design. Including, but not limited to:
-- Using Docker for environment simulations and setup.
-- Building an array of unit tests for testing each module under different circumstances/workloads, and comparing actual and predicted results after running them through the API.
-- Datasets: Yelp/Snap provided in the project description (starting with the mathoverflow dataset).
-- Measuring the performance difference between embedded functions and remote functions.
+- Docker for simulations on local; however, if not enough computing power, we can use AWS EC2 or DigitalOcean droplet to deploy it. (or use kubernetes as instructed in the official documentation)
+- Create unit tests to test individual Statefun
+- Compare actual and predicted results after running it through the API
+- Datasets: Yelp/Snap provided in the project description (we’ll start with the mathoverflow dataset and use other directed temporal graph dataset to confirm our library)
+- Measure and compare the latency & throughput of embedded functions and remote functions using metrics provided in the SDK
+
 
 # 5) Success Indicators
 __Outcome__:
-The final outcome of this project is an usable API library built on top of Flink Stateful functions that is able to effieicntly process temporal graphs, perform graph updates and modifications, and also run specific graph algorithms to produce analytical results based on user queries.
-__Success Measurement__:
-Our primary goal is to implement a working API library. We will also perform unit test on each function to ensure correctness and run simulations if possible. We also plan to compare performance difference among different stateful function architectures(e.g. embedded and remote functions).
+The final outcome of this project is a set of Flink stateful functions that are able to effieicntly process temporal graphs, perform graph updates and modifications, and also run specific graph algorithms to produce analytical results based on user queries.
 __Milestones__:
 1. Overall Architecture design (what type of I/O components to use and the overall dataflow within our statefun application) => will produce an architecture diagram
 2. Complete skeleton code(abstractions/interface/customized data types). Implement the architecture(write configuration in module.yaml and simple web server for serving the fucntions)
-3. Create unit tests to measure the correctness/performance of our statefun application (__Important__: leave comments on what the function does and its parameters)
+3. Create unit tests to measure the correctness of our stateful functions
 4. Complete the logic for converting raw data into appropriate temporal graph representation (using states in individual functions to create an abstraction of a graph)
 5. Complete stateful functions that perform basic graph update operations (e.g. edge addition/deletion)
 6. Complete functions that handle queries and functions that perform advanced operations on temporal graph based on the queries.
-7. Run experiments/tests and gather performance data
+7. Run experiments/tests and gather performance(latency & throughput) data
 8. Make adjustments/experiments based on experiments conducted before
 
 # 6) Tasks
