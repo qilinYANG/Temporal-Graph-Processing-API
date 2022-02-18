@@ -47,6 +47,8 @@ Series of steps required to evaluate the correctness and efficacy of the propose
 - Compare actual and predicted results after running it through the API
 - Datasets: Yelp/Snap provided in the project description (we’ll start with the mathoverflow dataset and use other directed temporal graph dataset to confirm our library)
 - Measure and compare the latency & throughput of embedded functions and remote functions using metrics provided in the SDK
+  - To measure throughput, we can dispatch event at a fixed rate and use the Flink's built-in metric report to check throughput and see if our functions can keep up with the input rate
+  - To measure latency, we can embed and start a timer when we receive a event, and check the time elapsed after we finished processing the event
 
 
 # 5) Success Indicators
@@ -58,7 +60,7 @@ __Milestones__:
 3. Create unit tests to measure the correctness of our stateful functions
 4. Complete the logic for converting raw data into appropriate temporal graph representation (using states in individual functions to create an abstraction of a graph)
 5. Complete stateful functions that perform basic graph update operations (e.g. edge addition/deletion)
-6. Complete functions that handle queries and functions that perform advanced operations on temporal graph based on the queries.
+6. Complete functions that handle queries and functions that perform certain algorithms on temporal graph based on the queries.
 7. Run experiments/tests and gather performance(latency & throughput) data
 8. Make adjustments/experiments based on experiments conducted before
 
