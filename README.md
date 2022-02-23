@@ -1,7 +1,7 @@
 # Unbounded/Bounded Temporal Graph Processing API Library for [Flink](https://flink.apache.org/flink-applications.html)
 
 # Example of Graph Temporal Library Architecture
-![architecture](./architecture.png)
+<img src="./architecture.png" width="200px">
 
 # How weekly meeting will work
 In each meeting (Monday 9pm), a group member will be appointed as a leader (on a rotation basis). The meeting leader will have the following responsibilities:
