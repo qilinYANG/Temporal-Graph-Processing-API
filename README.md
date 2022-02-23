@@ -1,6 +1,7 @@
 # Unbounded/Bounded Temporal Graph Processing API Library for [Flink](https://flink.apache.org/flink-applications.html)
 
-# 2
+# Example of Graph Temporal Library Architecture
+![architecture](./architecture.png)
 
 # 3
 
