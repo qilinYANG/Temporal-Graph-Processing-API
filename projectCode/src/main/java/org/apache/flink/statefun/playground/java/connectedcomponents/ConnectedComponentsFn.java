@@ -64,6 +64,7 @@ final class ConnectedComponentsFn implements StatefulFunction {
       String inputTimestamp = Instant.ofEpochMilli(vertex.getTimestamp()).atZone(ZoneId.of("America/New_York")).toString();
       System.out.println("Received: " + vertex.getSrc() + "->" + vertex.getDst() + " at t=" + vertex.getTimestamp() + " (" + inputTimestamp + ")");
 
+      sendIncomingEdge(context, vertex);
       outputResult(
           context, vertex, inputTimestamp);
     }
@@ -73,6 +74,20 @@ final class ConnectedComponentsFn implements StatefulFunction {
 
   private Map<Integer, List<Tuple2<Vertex, Long>>> getCurrentVertexMap(Context context) {
     return context.storage().get(VERTEX_MAP).orElse(new HashMap<Integer, List<Tuple2<Vertex, Long>>>());
+  }
+
+  /**
+   * Send a message to InEdgesQueryFn so that InEdgesQueryFn can keep track of the incoming
+   * edges of a vertex.
+   * @param context
+   * @param v
+   */
+  private void sendIncomingEdge(Context context, Vertex v) {
+    context.send(
+        MessageBuilder.forAddress(InEdgesQueryFn.TYPE_NAME, String.valueOf(v.getDst()))
+            .withCustomType(Types.Add_IN_EDGE_TYPE, v)
+            .build()
+    );
   }
 
   private void outputResult(Context context, Vertex v, String timestamp) {
