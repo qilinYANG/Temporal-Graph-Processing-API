@@ -27,6 +27,13 @@ public final class Types {
           JSON_OBJ_MAPPER::writeValueAsBytes,
           bytes -> JSON_OBJ_MAPPER.readValue(bytes, Vertex.class));
 
+  /**
+   * type for the message to add new incoming edge of a vertex
+   * since we are sending a Vertex in the message, this type is same as the VERTEX_INIT_TYPE,
+   * but we are not initializing a vertex with this type
+   */
+  public static final Type<Vertex> Add_IN_EDGE_TYPE = VERTEX_INIT_TYPE;
+
 //   @SuppressWarnings("unchecked")
 //   public static final Type<Set<Integer>> NEIGHBOURS_TYPE =
 //       SimpleType.simpleImmutableTypeFrom(
@@ -47,6 +54,13 @@ public final class Types {
           TypeName.typeNameOf(TYPES_NAMESPACE, "inNeighbors"),
           JSON_OBJ_MAPPER::writeValueAsBytes,
           bytes -> JSON_OBJ_MAPPER.readValue(bytes, List.class)
+      );
+
+  public static final Type<InEdgesQuery> IN_EDGES_QUERY_TYPE =
+      SimpleType.simpleImmutableTypeFrom(
+          TypeName.typeNameOf(TYPES_NAMESPACE, "inEdgesQuery"),
+          JSON_OBJ_MAPPER::writeValueAsBytes,
+          bytes -> JSON_OBJ_MAPPER.readValue(bytes, InEdgesQuery.class)
       );
 
   public static final Type<EgressRecord> EGRESS_RECORD_JSON_TYPE =
