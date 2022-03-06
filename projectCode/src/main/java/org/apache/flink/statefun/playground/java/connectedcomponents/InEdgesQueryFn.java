@@ -72,7 +72,7 @@ public class InEdgesQueryFn implements StatefulFunction {
     Tuple2<Integer, Long> newInNeighbor = new Tuple2<>(vertex.getSrc(), vertex.getTimestamp());
     // perform binary search to add incoming neighbor to the correct index, so that the IN_NEIGHBORS list remains
     // sorted by timestamp
-    int left = 0, right = currentInNeighbors.size();
+    int left = 0, right = currentInNeighbors.size() - 1;
     int insertIdx = -1;
     while (left <= right) {
       int mid = left + (right-left)/2;
