@@ -64,7 +64,7 @@ final class ConnectedComponentsFn implements StatefulFunction {
       String inputTimestamp = Instant.ofEpochMilli(vertex.getTimestamp()).atZone(ZoneId.of("America/New_York")).toString();
       System.out.println("Received: " + vertex.getSrc() + "->" + vertex.getDst() + " at t=" + vertex.getTimestamp() + " (" + inputTimestamp + ")");
 
-      sendIncomingEdge(context, vertex);
+      // sendIncomingEdge(context, vertex);
       outputResult(
           context, vertex, inputTimestamp);
     }
