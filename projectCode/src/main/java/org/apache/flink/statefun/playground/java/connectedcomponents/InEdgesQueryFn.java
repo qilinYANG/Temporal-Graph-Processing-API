@@ -1,10 +1,6 @@
 package org.apache.flink.statefun.playground.java.connectedcomponents;
 
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.statefun.playground.java.connectedcomponents.types.EgressRecord;
-import org.apache.flink.statefun.playground.java.connectedcomponents.types.InEdgesQuery;
-import org.apache.flink.statefun.playground.java.connectedcomponents.types.Types;
-import org.apache.flink.statefun.playground.java.connectedcomponents.types.Vertex;
+import org.apache.flink.statefun.playground.java.connectedcomponents.types.*;
 import org.apache.flink.statefun.sdk.java.*;
 import org.apache.flink.statefun.sdk.java.message.EgressMessageBuilder;
 import org.apache.flink.statefun.sdk.java.message.Message;
@@ -25,14 +21,14 @@ import java.util.concurrent.CompletableFuture;
  */
 public class InEdgesQueryFn implements StatefulFunction {
 
-  private static final ValueSpec<List<Tuple2<Integer, Long>>> IN_NEIGHBORS =
+  private static final ValueSpec<List<CustomTuple2>> IN_NEIGHBORS =
       ValueSpec.named("inNeighbors").withCustomType(Types.IN_NEIGHBORS_TYPE);
 
   static final TypeName TYPE_NAME = TypeName.typeNameOf("connected-components.fns", "inEdges");
   static final StatefulFunctionSpec SPEC =
       StatefulFunctionSpec.builder(TYPE_NAME)
           .withSupplier(InEdgesQueryFn::new)
-          .withValueSpecs()
+          .withValueSpecs(IN_NEIGHBORS)
           .build();
 
   static final TypeName EGRESS_TYPE = TypeName.typeNameOf("io.statefun.playground", "egress");
@@ -41,8 +37,9 @@ public class InEdgesQueryFn implements StatefulFunction {
   public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
     if (message.is(Types.Add_IN_EDGE_TYPE)) {
       Vertex vertex = message.as(Types.Add_IN_EDGE_TYPE);
-      List<Tuple2<Integer, Long>> currentInNeighbors = getCurrentInNeighbors(context);
+      List<CustomTuple2> currentInNeighbors = getCurrentInNeighbors(context);
       updateInNeighbors(context, vertex, currentInNeighbors);
+      // logInNeighbors(vertex.getDst(), context);
     } else if (message.is(Types.IN_EDGES_QUERY_TYPE)) {
       InEdgesQuery query = message.as(Types.IN_EDGES_QUERY_TYPE);
       // the query we are implementing now is simple; it is only asking for all the incoming edges, so we can
@@ -57,8 +54,8 @@ public class InEdgesQueryFn implements StatefulFunction {
    * @param context
    * @return IN_NEIGHBORS
    */
-  private List<Tuple2<Integer, Long>> getCurrentInNeighbors(Context context) {
-    return context.storage().get(IN_NEIGHBORS).orElse(new ArrayList<Tuple2<Integer, Long>>());
+  private List<CustomTuple2> getCurrentInNeighbors(Context context) {
+    return context.storage().get(IN_NEIGHBORS).orElse(new ArrayList<CustomTuple2>());
   }
 
   /**
@@ -68,21 +65,21 @@ public class InEdgesQueryFn implements StatefulFunction {
    * @param vertex
    * @param currentInNeighbors
    */
-  private void updateInNeighbors(Context context, Vertex vertex, List<Tuple2<Integer, Long>> currentInNeighbors) {
-    Tuple2<Integer, Long> newInNeighbor = new Tuple2<>(vertex.getSrc(), vertex.getTimestamp());
+  private void updateInNeighbors(Context context, Vertex vertex, List<CustomTuple2> currentInNeighbors) {
+    CustomTuple2 newInNeighbor = CustomTuple2.createTuple2(vertex.getSrc(), vertex.getTimestamp());
     // perform binary search to add incoming neighbor to the correct index, so that the IN_NEIGHBORS list remains
     // sorted by timestamp
     int left = 0, right = currentInNeighbors.size() - 1;
-    int insertIdx = -1;
+    int insertIdx = 0;
     while (left <= right) {
       int mid = left + (right-left)/2;
-      Long t1 = currentInNeighbors.get(mid).getField(1);
-      Long t2 = newInNeighbor.getField(1);
+      Long t1 = currentInNeighbors.get(mid).getF1();
+      Long t2 = newInNeighbor.getF1();
       int comparison = t1.compareTo(t2);
       if (comparison == 0) {
         insertIdx = mid;
         break;
-      } else if (comparison < 0){
+      } else if (comparison < 0) {
         left = mid + 1;
         insertIdx = left;
       } else {
@@ -99,7 +96,7 @@ public class InEdgesQueryFn implements StatefulFunction {
    * @param vertexId
    */
   private void outputResult(Context context, int vertexId) {
-    List<Tuple2<Integer, Long>> currentInNeighbors =
+    List<CustomTuple2> currentInNeighbors =
         context.storage().get(IN_NEIGHBORS).orElse(Collections.emptyList());
 
     context.send(
@@ -109,5 +106,16 @@ public class InEdgesQueryFn implements StatefulFunction {
                     String.format("The incoming edges of vertex %s are %s", vertexId, currentInNeighbors)))
             .build()
     );
+  }
+
+  /**
+   * This methods prints out the current incoming edges/neighbors of a vertex
+   * @param vertex
+   * @param context
+   */
+  private void logInNeighbors(int vertex, Context context) {
+    List<CustomTuple2> currentInNeighbors = context.storage().get(IN_NEIGHBORS).orElse(Collections.emptyList());
+
+    System.out.printf("vertex %d currently has these incoming neighbors: %s\n", vertex, currentInNeighbors);
   }
 }
