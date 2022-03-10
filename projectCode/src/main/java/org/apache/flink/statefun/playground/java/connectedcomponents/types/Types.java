@@ -1,5 +1,7 @@
 package org.apache.flink.statefun.playground.java.connectedcomponents.types;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
@@ -49,11 +51,11 @@ public final class Types {
           bytes -> JSON_OBJ_MAPPER.readValue(bytes, Map.class));
 
   @SuppressWarnings("unchecked")
-  public static final Type<List<Tuple2<Integer, Long>>> IN_NEIGHBORS_TYPE =
+  public static final Type<List<CustomTuple2>> IN_NEIGHBORS_TYPE =
       SimpleType.simpleImmutableTypeFrom(
           TypeName.typeNameOf(TYPES_NAMESPACE, "inNeighbors"),
           JSON_OBJ_MAPPER::writeValueAsBytes,
-          bytes -> JSON_OBJ_MAPPER.readValue(bytes, List.class)
+          bytes -> JSON_OBJ_MAPPER.readValue(bytes, new TypeReference<List<CustomTuple2>>() {})
       );
 
   public static final Type<InEdgesQuery> IN_EDGES_QUERY_TYPE =
