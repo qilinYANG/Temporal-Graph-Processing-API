@@ -51,11 +51,11 @@ public final class Types {
           bytes -> JSON_OBJ_MAPPER.readValue(bytes, Map.class));
 
   @SuppressWarnings("unchecked")
-  public static final Type<List<CustomTuple2>> IN_NEIGHBORS_TYPE =
+  public static final Type<List<CustomTuple2<Integer, Long>>> IN_NEIGHBORS_TYPE =
       SimpleType.simpleImmutableTypeFrom(
           TypeName.typeNameOf(TYPES_NAMESPACE, "inNeighbors"),
           JSON_OBJ_MAPPER::writeValueAsBytes,
-          bytes -> JSON_OBJ_MAPPER.readValue(bytes, new TypeReference<List<CustomTuple2>>() {})
+          bytes -> JSON_OBJ_MAPPER.readValue(bytes, new TypeReference<List<CustomTuple2<Integer, Long>>>() {})
       );
 
   public static final Type<InEdgesQuery> IN_EDGES_QUERY_TYPE =
