@@ -21,7 +21,7 @@ import java.util.concurrent.CompletableFuture;
  */
 public class InEdgesQueryFn implements StatefulFunction {
 
-  private static final ValueSpec<List<CustomTuple2>> IN_NEIGHBORS =
+  private static final ValueSpec<List<CustomTuple2<Integer, Long>>> IN_NEIGHBORS =
       ValueSpec.named("inNeighbors").withCustomType(Types.IN_NEIGHBORS_TYPE);
 
   static final TypeName TYPE_NAME = TypeName.typeNameOf("connected-components.fns", "inEdges");
@@ -37,9 +37,9 @@ public class InEdgesQueryFn implements StatefulFunction {
   public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
     if (message.is(Types.Add_IN_EDGE_TYPE)) {
       Vertex vertex = message.as(Types.Add_IN_EDGE_TYPE);
-      List<CustomTuple2> currentInNeighbors = getCurrentInNeighbors(context);
+      List<CustomTuple2<Integer, Long>> currentInNeighbors = getCurrentInNeighbors(context);
       updateInNeighbors(context, vertex, currentInNeighbors);
-      // logInNeighbors(vertex.getDst(), context);
+      logInNeighbors(vertex.getDst(), context);
     } else if (message.is(Types.IN_EDGES_QUERY_TYPE)) {
       InEdgesQuery query = message.as(Types.IN_EDGES_QUERY_TYPE);
       // the query we are implementing now is simple; it is only asking for all the incoming edges, so we can
@@ -54,8 +54,8 @@ public class InEdgesQueryFn implements StatefulFunction {
    * @param context
    * @return IN_NEIGHBORS
    */
-  private List<CustomTuple2> getCurrentInNeighbors(Context context) {
-    return context.storage().get(IN_NEIGHBORS).orElse(new ArrayList<CustomTuple2>());
+  private List<CustomTuple2<Integer, Long>> getCurrentInNeighbors(Context context) {
+    return context.storage().get(IN_NEIGHBORS).orElse(new ArrayList<CustomTuple2<Integer, Long>>());
   }
 
   /**
@@ -65,16 +65,16 @@ public class InEdgesQueryFn implements StatefulFunction {
    * @param vertex
    * @param currentInNeighbors
    */
-  private void updateInNeighbors(Context context, Vertex vertex, List<CustomTuple2> currentInNeighbors) {
-    CustomTuple2 newInNeighbor = CustomTuple2.createTuple2(vertex.getSrc(), vertex.getTimestamp());
+  private void updateInNeighbors(Context context, Vertex vertex, List<CustomTuple2<Integer, Long>> currentInNeighbors) {
+    CustomTuple2<Integer, Long> newInNeighbor = CustomTuple2.createTuple2(vertex.getSrc(), vertex.getTimestamp());
     // perform binary search to add incoming neighbor to the correct index, so that the IN_NEIGHBORS list remains
     // sorted by timestamp
     int left = 0, right = currentInNeighbors.size() - 1;
     int insertIdx = 0;
     while (left <= right) {
       int mid = left + (right-left)/2;
-      Long t1 = currentInNeighbors.get(mid).getF1();
-      Long t2 = newInNeighbor.getF1();
+      Long t1 = currentInNeighbors.get(mid).getField(1);
+      Long t2 = newInNeighbor.getField(1);
       int comparison = t1.compareTo(t2);
       if (comparison == 0) {
         insertIdx = mid;
@@ -96,7 +96,7 @@ public class InEdgesQueryFn implements StatefulFunction {
    * @param vertexId
    */
   private void outputResult(Context context, int vertexId) {
-    List<CustomTuple2> currentInNeighbors =
+    List<CustomTuple2<Integer, Long>> currentInNeighbors =
         context.storage().get(IN_NEIGHBORS).orElse(Collections.emptyList());
 
     context.send(
@@ -114,7 +114,7 @@ public class InEdgesQueryFn implements StatefulFunction {
    * @param context
    */
   private void logInNeighbors(int vertex, Context context) {
-    List<CustomTuple2> currentInNeighbors = context.storage().get(IN_NEIGHBORS).orElse(Collections.emptyList());
+    List<CustomTuple2<Integer, Long>> currentInNeighbors = context.storage().get(IN_NEIGHBORS).orElse(Collections.emptyList());
 
     System.out.printf("vertex %d currently has these incoming neighbors: %s\n", vertex, currentInNeighbors);
   }
