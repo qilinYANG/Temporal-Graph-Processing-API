@@ -7,6 +7,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
 
+/**
+ * An app for reading a text file inside the data directory to be sent to the stateful function for edge addition.
+ * The app reads each line in text file and recursively send PUT request to the Undertow web server on ConnectedComponentsAppsServer;
+ * therefore, the app has to be run in parallel with the docker-compose.
+ */
 public class ConnectedComponentFilesApp {
     public static void main(String[] args) throws Exception {
         Scanner scanner = new Scanner(System.in);
