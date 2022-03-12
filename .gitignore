@@ -1,3 +1,8 @@
 # system dirs and files
 .idea/
 .DS_Store
+target/
+projectCode/target/
+.classpath
+.project
+.settings/
