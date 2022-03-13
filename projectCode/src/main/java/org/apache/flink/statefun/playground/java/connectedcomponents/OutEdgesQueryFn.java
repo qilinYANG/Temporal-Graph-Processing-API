@@ -26,7 +26,6 @@ public class OutEdgesQueryFn implements StatefulFunction {
 
     static final TypeName TYPE_NAME = TypeName.typeNameOf("connected-components.fns", "outEdges");
     static final StatefulFunctionSpec SPEC =
-
             StatefulFunctionSpec.builder(TYPE_NAME)
                     .withSupplier(OutEdgesQueryFn::new)
                     .withValueSpecs(OUT_NEIGHBORS)
@@ -40,7 +39,7 @@ public class OutEdgesQueryFn implements StatefulFunction {
             Vertex vertex = message.as(Types.Add_OUT_EDGE_TYPE);
             List<CustomTuple2<Integer, Long>> currentOutNeighbors = getCurrentOutNeighbors(context);
             updateOutNeighbors(context, vertex, currentOutNeighbors);
-            logInNeighbors(vertex.getDst(), context);
+            logOutNeighbors(vertex.getSrc(), context);
         } else if (message.is(Types.OUT_EDGES_QUERY_TYPE)) {
             OutEdgesQuery query = message.as(Types.OUT_EDGES_QUERY_TYPE);
             // the query we are implementing now is simple; it is only asking for all the incoming edges, so we can
@@ -67,7 +66,7 @@ public class OutEdgesQueryFn implements StatefulFunction {
      * @param currentOutNeighbors
      */
     private void updateOutNeighbors(Context context, Vertex vertex, List<CustomTuple2<Integer, Long>> currentOutNeighbors) {
-        CustomTuple2<Integer, Long> newOutNeighbor = CustomTuple2.createTuple2(vertex.getSrc(), vertex.getTimestamp());
+        CustomTuple2<Integer, Long> newOutNeighbor = CustomTuple2.createTuple2(vertex.getDst(), vertex.getTimestamp());
         // perform binary search to add incoming neighbor to the correct index, so that the IN_NEIGHBORS list remains
         // sorted by timestamp
         int left = 0, right = currentOutNeighbors.size() - 1;
@@ -114,7 +113,7 @@ public class OutEdgesQueryFn implements StatefulFunction {
      * @param vertex
      * @param context
      */
-    private void logInNeighbors(int vertex, Context context) {
+    private void logOutNeighbors(int vertex, Context context) {
         List<CustomTuple2<Integer, Long>> currentOutNeighbors = context.storage().get(OUT_NEIGHBORS).orElse(Collections.emptyList());
 
         System.out.printf("vertex %d currently has these outgoing neighbors: %s\n", vertex, currentOutNeighbors);
