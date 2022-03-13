@@ -37,6 +37,7 @@ public final class ConnectedComponentsAppServer {
     final StatefulFunctions functions = new StatefulFunctions();
     functions.withStatefulFunction(ConnectedComponentsFn.SPEC);
     functions.withStatefulFunction(InEdgesQueryFn.SPEC);
+    functions.withStatefulFunction(OutEdgesQueryFn.SPEC);
 
     final RequestReplyHandler requestReplyHandler = functions.requestReplyHandler();
     final Undertow httpServer =
