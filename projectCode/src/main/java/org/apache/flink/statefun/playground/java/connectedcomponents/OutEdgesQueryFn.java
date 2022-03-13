@@ -28,7 +28,7 @@ public class OutEdgesQueryFn implements StatefulFunction {
     static final StatefulFunctionSpec SPEC =
 
             StatefulFunctionSpec.builder(TYPE_NAME)
-                    .withSupplier(InEdgesQueryFn::new)
+                    .withSupplier(OutEdgesQueryFn::new)
                     .withValueSpecs(OUT_NEIGHBORS)
                     .build();
 
@@ -38,8 +38,8 @@ public class OutEdgesQueryFn implements StatefulFunction {
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
         if (message.is(Types.Add_OUT_EDGE_TYPE)) {
             Vertex vertex = message.as(Types.Add_OUT_EDGE_TYPE);
-            List<CustomTuple2<Integer, Long>> currentInNeighbors = getCurrentInNeighbors(context);
-            updateInNeighbors(context, vertex, currentInNeighbors);
+            List<CustomTuple2<Integer, Long>> currentOutNeighbors = getCurrentOutNeighbors(context);
+            updateOutNeighbors(context, vertex, currentOutNeighbors);
             logInNeighbors(vertex.getDst(), context);
         } else if (message.is(Types.OUT_EDGES_QUERY_TYPE)) {
             OutEdgesQuery query = message.as(Types.OUT_EDGES_QUERY_TYPE);
@@ -55,27 +55,27 @@ public class OutEdgesQueryFn implements StatefulFunction {
      * @param context
      * @return IN_NEIGHBORS
      */
-    private List<CustomTuple2<Integer, Long>> getCurrentInNeighbors(Context context) {
+    private List<CustomTuple2<Integer, Long>> getCurrentOutNeighbors(Context context) {
         return context.storage().get(OUT_NEIGHBORS).orElse(new ArrayList<CustomTuple2<Integer, Long>>());
     }
 
     /**
-     * This method update the IN_NEIGHBORS list by adding a new incoming neighbor to the list
+     * This method update the IN_NEIGHBORS list by adding a new outgoing neighbor to the list
      * while ensuring that all the neighbors in the list are sorted by timestamp value
      * @param context
      * @param vertex
-     * @param currentInNeighbors
+     * @param currentOutNeighbors
      */
-    private void updateInNeighbors(Context context, Vertex vertex, List<CustomTuple2<Integer, Long>> currentInNeighbors) {
-        CustomTuple2<Integer, Long> newInNeighbor = CustomTuple2.createTuple2(vertex.getSrc(), vertex.getTimestamp());
+    private void updateOutNeighbors(Context context, Vertex vertex, List<CustomTuple2<Integer, Long>> currentOutNeighbors) {
+        CustomTuple2<Integer, Long> newOutNeighbor = CustomTuple2.createTuple2(vertex.getSrc(), vertex.getTimestamp());
         // perform binary search to add incoming neighbor to the correct index, so that the IN_NEIGHBORS list remains
         // sorted by timestamp
-        int left = 0, right = currentInNeighbors.size() - 1;
+        int left = 0, right = currentOutNeighbors.size() - 1;
         int insertIdx = 0;
         while (left <= right) {
             int mid = left + (right-left)/2;
-            Long t1 = currentInNeighbors.get(mid).getField(1);
-            Long t2 = newInNeighbor.getField(1);
+            Long t1 = currentOutNeighbors.get(mid).getField(1);
+            Long t2 = newOutNeighbor.getField(1);
             int comparison = t1.compareTo(t2);
             if (comparison == 0) {
                 insertIdx = mid;
@@ -87,8 +87,8 @@ public class OutEdgesQueryFn implements StatefulFunction {
                 right = mid - 1;
             }
         }
-        currentInNeighbors.add(insertIdx, newInNeighbor);
-        context.storage().set(OUT_NEIGHBORS, currentInNeighbors);
+        currentOutNeighbors.add(insertIdx, newOutNeighbor);
+        context.storage().set(OUT_NEIGHBORS, currentOutNeighbors);
     }
 
     /**
@@ -97,14 +97,14 @@ public class OutEdgesQueryFn implements StatefulFunction {
      * @param vertexId
      */
     private void outputResult(Context context, int vertexId) {
-        List<CustomTuple2<Integer, Long>> currentInNeighbors =
+        List<CustomTuple2<Integer, Long>> currentOutNeighbors =
                 context.storage().get(OUT_NEIGHBORS).orElse(Collections.emptyList());
 
         context.send(
                 EgressMessageBuilder.forEgress(EGRESS_TYPE)
                         .withCustomType(Types.EGRESS_RECORD_JSON_TYPE,
                                 new EgressRecord("outgoing-edges",
-                                        String.format("The outgoing edges of vertex %s are %s", vertexId, currentInNeighbors)))
+                                        String.format("The outgoing edges of vertex %s are %s", vertexId, currentOutNeighbors)))
                         .build()
         );
     }
@@ -115,8 +115,8 @@ public class OutEdgesQueryFn implements StatefulFunction {
      * @param context
      */
     private void logInNeighbors(int vertex, Context context) {
-        List<CustomTuple2<Integer, Long>> currentInNeighbors = context.storage().get(OUT_NEIGHBORS).orElse(Collections.emptyList());
+        List<CustomTuple2<Integer, Long>> currentOutNeighbors = context.storage().get(OUT_NEIGHBORS).orElse(Collections.emptyList());
 
-        System.out.printf("vertex %d currently has these outgoing neighbors: %s\n", vertex, currentInNeighbors);
+        System.out.printf("vertex %d currently has these outgoing neighbors: %s\n", vertex, currentOutNeighbors);
     }
 }
