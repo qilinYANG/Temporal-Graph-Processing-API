@@ -29,3 +29,7 @@ spec:
   port: 8091
   topics:
     - connected-component-changes
+---
+  port: 8092
+    topics:
+      - outgoing-edges
