@@ -30,3 +30,4 @@ spec:
   topics:
     - connected-component-changes
     - incoming-edges
+    - outgoing-edges
