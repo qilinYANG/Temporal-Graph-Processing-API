@@ -36,8 +36,7 @@ public final class ConnectedComponentsAppServer {
   public static void main(String[] args) {
     final StatefulFunctions functions = new StatefulFunctions();
     functions.withStatefulFunction(ConnectedComponentsFn.SPEC);
-    // InEdgesQueryFn depends on other functions to work, so I leave the function registration as comment for now
-    // functions.withStatefulFunction(InEdgesQueryFn.SPEC);
+    functions.withStatefulFunction(InEdgesQueryFn.SPEC);
 
     final RequestReplyHandler requestReplyHandler = functions.requestReplyHandler();
     final Undertow httpServer =
