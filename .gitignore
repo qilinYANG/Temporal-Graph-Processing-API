@@ -6,3 +6,5 @@ projectCode/target/
 .classpath
 .project
 .settings/
+*.class
+.vscode

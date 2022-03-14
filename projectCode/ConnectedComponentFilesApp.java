@@ -1,4 +1,4 @@
-package org.apache.flink.statefun.playground.java.connectedcomponents;
+// package org.apache.flink.statefun.playground.java.connectedcomponents;
 
 import java.io.DataOutputStream;
 import java.io.File;
