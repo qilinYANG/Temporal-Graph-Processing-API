@@ -26,7 +26,9 @@ import org.apache.flink.api.java.tuple.Tuple2;
 
 
 /**
- * A function for handling incoming requests 
+ * A function for handling incoming requests.
+ * All requests are routed via the vertex route.
+ * Different stateful function are dispatched depending on the task within the execute method.
  */
 final class ConnectedComponentsFn implements StatefulFunction {
   static final TypeName TYPE_NAME = TypeName.typeNameOf("connected-components.fns", "vertex");
