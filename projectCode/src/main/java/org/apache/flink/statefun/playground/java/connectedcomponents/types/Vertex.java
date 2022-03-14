@@ -18,6 +18,12 @@ public class Vertex {
 
   public Vertex() {}
 
+  public Vertex(int src, int dst, long timestamp) {
+    this.src = src;
+    this.dst = dst;
+    this.timestamp = timestamp;
+  }
+
   public int getSrc() {
     return src;
   }

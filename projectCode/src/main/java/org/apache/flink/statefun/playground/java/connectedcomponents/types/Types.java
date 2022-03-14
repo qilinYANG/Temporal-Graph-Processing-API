@@ -81,6 +81,13 @@ public final class Types {
                   bytes -> JSON_OBJ_MAPPER.readValue(bytes, OutEdgesQuery.class)
           );
 
+  public static final Type<Execute> EXECUTE_TYPE =
+          SimpleType.simpleImmutableTypeFrom(
+                  TypeName.typeNameOf(TYPES_NAMESPACE, "execute"),
+                  JSON_OBJ_MAPPER::writeValueAsBytes,
+                  bytes -> JSON_OBJ_MAPPER.readValue(bytes, Execute.class)
+          );
+
   public static final Type<EgressRecord> EGRESS_RECORD_JSON_TYPE =
       SimpleType.simpleImmutableTypeFrom(
           TypeName.typeNameOf("io.statefun.playground", "EgressRecord"),
