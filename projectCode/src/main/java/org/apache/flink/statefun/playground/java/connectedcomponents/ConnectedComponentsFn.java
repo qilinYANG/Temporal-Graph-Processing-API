@@ -26,56 +26,27 @@ import org.apache.flink.api.java.tuple.Tuple2;
 
 
 /**
- * A stateful function that computes the connected component for a stream of vertices.
- *
- * <p>The underlying algorithm is a form of label propagation and works by recording for every
- * vertex its component id. Whenever a vertex is created or its component id changes, it will send
- * this update to all of its neighbours. Every neighbour will compare the broadcast component id
- * with its own id. If the id is lower than its own, then it will accept this component id and
- * broadcast this change to its neighbours. If the own component id is smaller, then it answers to
- * the broadcaster by sending its own component id.
- *
- * <p>That way, the minimum component id of each connected component will be broadcast throughout
- * the whole connected component. Eventually, every vertex will have heard of the minimum component
- * id and have accepted it.
- *
- * <p>Every component id change will be output to the {@link #PLAYGROUND_EGRESS} as a connected
- * component change.
- *
- * @see <a href="https://en.wikipedia.org/wiki/Label_propagation_algorithm">Label propagation
- *     algorithm</a>
+ * A function for handling incoming requests 
  */
 final class ConnectedComponentsFn implements StatefulFunction {
-
-  /** {vertex: [<neighbor, timestamp>, ...]} */
-  private static final ValueSpec<Map<Integer, List<Tuple2<Vertex, Long>>>> VERTEX_MAP =
-      ValueSpec.named("vertexMap").withCustomType(Types.VERTEXMAP_TYPE);
-
   static final TypeName TYPE_NAME = TypeName.typeNameOf("connected-components.fns", "vertex");
   static final StatefulFunctionSpec SPEC =
       StatefulFunctionSpec.builder(TYPE_NAME)
           .withSupplier(ConnectedComponentsFn::new)
-          .withValueSpecs(VERTEX_MAP)
+          //.withValueSpecs(VERTEX_MAP)
           .build();
 
   static final TypeName PLAYGROUND_EGRESS = TypeName.typeNameOf("io.statefun.playground", "egress");
 
   @Override
   public CompletableFuture<Void> apply(Context context, Message message) {
-    // initialize a new vertex
-    if (message.is(Types.VERTEX_INIT_TYPE)) {
-      final Vertex vertex = message.as(Types.VERTEX_INIT_TYPE);
-      String inputTimestamp = Instant.ofEpochMilli(vertex.getTimestamp()).atZone(ZoneId.of("America/New_York")).toString();
-      System.out.println("Received: " + vertex.getSrc() + "->" + vertex.getDst() + " at t=" + vertex.getTimestamp() + " (" + inputTimestamp + ")");
-
-      // sendIncomingEdge(context, vertex);
-      outputResult(
-          context, vertex, inputTimestamp);
-    } else {
+    if (message.is(Types.EXECUTE_TYPE)) {
       System.out.println("Received Request");
       final Execute request = message.as(Types.EXECUTE_TYPE);
 
       if (request.getTask().equals("ADD")) {
+        System.out.println("Adding Vertex");
+
         Vertex v = new Vertex(
                 request.getSrc(),
                 request.getDst(),
@@ -93,6 +64,7 @@ final class ConnectedComponentsFn implements StatefulFunction {
                         .build()
         );
       } else if (request.getTask().equals("GET_IN_EDGES")) {
+        System.out.println("Fetching IN Edges");
         InEdgesQuery inQuery = InEdgesQuery.create(request.getDst(), request.getTimestamp());
 
         context.send(
@@ -101,6 +73,7 @@ final class ConnectedComponentsFn implements StatefulFunction {
                         .build()
         );
       } else if (request.getTask().equals("GET_OUT_EDGES")) {
+        System.out.println("Fetching OUT Edges");
         OutEdgesQuery outQuery = OutEdgesQuery.create(request.getSrc(), request.getTimestamp());
 
         context.send(
@@ -114,34 +87,5 @@ final class ConnectedComponentsFn implements StatefulFunction {
     }
 
     return context.done();
-  }
-
-  private Map<Integer, List<Tuple2<Vertex, Long>>> getCurrentVertexMap(Context context) {
-    return context.storage().get(VERTEX_MAP).orElse(new HashMap<Integer, List<Tuple2<Vertex, Long>>>());
-  }
-
-  /**
-   * Send a message to InEdgesQueryFn so that InEdgesQueryFn can keep track of the incoming
-   * edges of a vertex.
-   * @param context
-   * @param v
-   */
-  private void sendIncomingEdge(Context context, Vertex v) {
-    context.send(
-        MessageBuilder.forAddress(InEdgesQueryFn.TYPE_NAME, String.valueOf(v.getDst()))
-            .withCustomType(Types.Add_IN_EDGE_TYPE, v)
-            .build()
-    );
-  }
-
-  private void outputResult(Context context, Vertex v, String timestamp) {
-    context.send(
-        EgressMessageBuilder.forEgress(PLAYGROUND_EGRESS)
-            .withCustomType(
-                EGRESS_RECORD_JSON_TYPE,
-                new EgressRecord(
-                    "connected-component-changes",
-                    String.format("\nVertex %s->%s has the following timestamp: %s (%s)\n", v.getSrc(), v.getDst(), v.getTimestamp(), timestamp)))
-            .build());
   }
 }

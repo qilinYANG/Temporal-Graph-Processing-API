@@ -5,6 +5,10 @@ import org.apache.flink.api.java.tuple.Tuple3;
 
 import java.util.List;
 
+/**
+ * Simple class for unified command type.
+ * All commands to stateful fucntions are encapsulated as an Execute Object
+ */
 public class Execute {
     @JsonProperty("task")
     private String task;
