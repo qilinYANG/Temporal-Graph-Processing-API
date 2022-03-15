@@ -24,15 +24,15 @@ public class ConnectedComponentFilesApp {
             String[] inputStr = scFiles.nextLine().trim().split(" ");
 
             //create connection to undertow server
-            String protocol = String.format("http://localhost:8090/connected-components.fns/vertex/%1$s", inputStr[0]);
+            String protocol = String.format("http://localhost:8090/connected-components.fns/vertex/1");
 
             URL appServerUrl = new URL(protocol);
             HttpURLConnection con = (HttpURLConnection) appServerUrl.openConnection();
             con.setRequestMethod("PUT");
-            con.setRequestProperty("Content-Type", "application/vnd.connected-components.types/vertex");
+            con.setRequestProperty("Content-Type", "application/vnd.connected-components.types/execute");
             con.setDoOutput(true);
 
-            String jsonString = String.format("{\"src\": \"%1$s\", \"dst\": \"%2$s\", \"t\": \"%3$s\"}", inputStr[0], inputStr[1], inputStr[2]);
+            String jsonString = String.format("{\"task\": \"ADD\", \"src\": \"%1$s\", \"dst\": \"%2$s\", \"t\": \"%3$s\"}", inputStr[0], inputStr[1], inputStr[2]);
             System.out.println(jsonString);
 
             //write output to undertow web server
