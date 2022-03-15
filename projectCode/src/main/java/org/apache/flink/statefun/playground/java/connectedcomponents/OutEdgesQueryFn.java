@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * This function processes the query for counting the number of incoming edges of a vertex
- * In practice, there will be multiple logical instances of the InEdgesQueryFn, and the number of logical
+ * This function processes the query for counting the number of outgoing edges of a vertex
+ * In practice, there will be multiple logical instances of the OutEdgesQueryFn, and the number of logical
  * instances will be equal to the number of vertices in the graph. Each logical instance will be identified by the
- * address (InEdgesQueryFn.TYPE_NAME, vertex_id). In this case, each logical instance only needs to store the incoming
+ * address (OutEdgesQueryFn.TYPE_NAME, vertex_id). In this case, each logical instance only needs to store the incoming
  * edges for a specific vertex.
- * To send a query message to this function, please build a message with the IN_EDGES_QUERY_TYPE in {@link Types} and
+ * To send a query message to this function, please build a message with the OUT_EDGES_QUERY_TYPE in {@link Types} and
  * send to the address described above, where the vertex_id is the vertex we want to query
  */
 public class OutEdgesQueryFn implements StatefulFunction {
@@ -50,7 +50,7 @@ public class OutEdgesQueryFn implements StatefulFunction {
     }
 
     /**
-     * This method returns the current incoming neighbors of a vertex
+     * This method returns the current outgoing neighbors of a vertex
      * @param context
      * @return IN_NEIGHBORS
      */
@@ -59,7 +59,7 @@ public class OutEdgesQueryFn implements StatefulFunction {
     }
 
     /**
-     * This method update the IN_NEIGHBORS list by adding a new outgoing neighbor to the list
+     * This method update the OUT_NEIGHBORS list by adding a new outgoing neighbor to the list
      * while ensuring that all the neighbors in the list are sorted by timestamp value
      * @param context
      * @param vertex
@@ -109,7 +109,7 @@ public class OutEdgesQueryFn implements StatefulFunction {
     }
 
     /**
-     * This methods prints out the current incoming edges/neighbors of a vertex
+     * This methods prints out the current outgoing edges/neighbors of a vertex
      * @param vertex
      * @param context
      */
