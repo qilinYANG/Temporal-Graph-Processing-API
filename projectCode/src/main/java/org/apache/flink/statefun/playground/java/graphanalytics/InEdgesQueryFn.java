@@ -1,6 +1,6 @@
-package org.apache.flink.statefun.playground.java.connectedcomponents;
+package org.apache.flink.statefun.playground.java.graphanalytics;
 
-import org.apache.flink.statefun.playground.java.connectedcomponents.types.*;
+import org.apache.flink.statefun.playground.java.graphanalytics.types.*;
 import org.apache.flink.statefun.sdk.java.*;
 import org.apache.flink.statefun.sdk.java.message.EgressMessageBuilder;
 import org.apache.flink.statefun.sdk.java.message.Message;
@@ -24,7 +24,7 @@ public class InEdgesQueryFn implements StatefulFunction {
   private static final ValueSpec<List<CustomTuple2<Integer, Long>>> IN_NEIGHBORS =
       ValueSpec.named("inNeighbors").withCustomType(Types.IN_NEIGHBORS_TYPE);
 
-  static final TypeName TYPE_NAME = TypeName.typeNameOf("connected-components.fns", "inEdges");
+  static final TypeName TYPE_NAME = TypeName.typeNameOf("graph-analytics.fns", "inEdges");
   static final StatefulFunctionSpec SPEC =
       StatefulFunctionSpec.builder(TYPE_NAME)
           .withSupplier(InEdgesQueryFn::new)

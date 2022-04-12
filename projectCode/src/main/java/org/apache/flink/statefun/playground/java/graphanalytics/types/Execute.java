@@ -1,9 +1,6 @@
-package org.apache.flink.statefun.playground.java.connectedcomponents.types;
+package org.apache.flink.statefun.playground.java.graphanalytics.types;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.apache.flink.api.java.tuple.Tuple3;
-
-import java.util.List;
 
 /**
  * Simple class for unified command type.

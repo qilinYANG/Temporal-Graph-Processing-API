@@ -21,7 +21,7 @@ under the License.
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.apache.flink</groupId>
-    <artifactId>connected-components-functions-app</artifactId>
+    <artifactId>graph-analytics-functions-app</artifactId>
     <version>3.2.0</version>
     <packaging>jar</packaging>
 
@@ -83,7 +83,7 @@ under the License.
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>org.apache.flink.statefun.playground.java.connectedcomponents.ConnectedComponentsAppServer</mainClass>
+                            <mainClass>org.apache.flink.statefun.playground.java.graphanalytics.GraphAnalyticsAppServer</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

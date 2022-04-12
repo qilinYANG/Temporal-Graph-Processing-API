@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.apache.flink.statefun.playground.java.connectedcomponents.undertow;
+package org.apache.flink.statefun.playground.java.graphanalytics.undertow;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;

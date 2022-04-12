@@ -6,8 +6,8 @@ rebuild:
 	docker-compose up --build
 
 ingress:
-	javac ConnectedComponentFilesApp.java
-	java ConnectedComponentFilesApp
+	javac GraphAnalyticsFilesApp.java
+	java GraphAnalyticsFilesApp
 	make clean
 
 clean:

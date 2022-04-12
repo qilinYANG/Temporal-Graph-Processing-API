@@ -16,26 +16,26 @@
  * limitations under the License.
  */
 
-package org.apache.flink.statefun.playground.java.connectedcomponents;
+package org.apache.flink.statefun.playground.java.graphanalytics;
 
 import io.undertow.Undertow;
-import org.apache.flink.statefun.playground.java.connectedcomponents.undertow.UndertowHttpHandler;
+import org.apache.flink.statefun.playground.java.graphanalytics.undertow.UndertowHttpHandler;
 import org.apache.flink.statefun.sdk.java.StatefulFunctions;
 import org.apache.flink.statefun.sdk.java.handler.RequestReplyHandler;
 
 /**
  * Entry point to start an {@link Undertow} web server that exposes the functions that build up our
- * connected components application {@link ConnectedComponentsFn}.
+ * connected components application {@link EventsFilterFn}.
  *
  * <p>Here we are using the {@link Undertow} web server just to show a very simple demonstration.
  * You may choose any web server that can handle HTTP request and responses, for example, Spring,
  * Micronaut, or even deploy your functions on popular FaaS platforms, like AWS Lambda.
  */
-public final class ConnectedComponentsAppServer {
+public final class GraphAnalyticsAppServer {
 
   public static void main(String[] args) {
     final StatefulFunctions functions = new StatefulFunctions();
-    functions.withStatefulFunction(ConnectedComponentsFn.SPEC);
+    functions.withStatefulFunction(EventsFilterFn.SPEC);
     functions.withStatefulFunction(InEdgesQueryFn.SPEC);
     functions.withStatefulFunction(OutEdgesQueryFn.SPEC);
 
