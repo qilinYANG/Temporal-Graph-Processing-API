@@ -1,7 +1,6 @@
-package org.apache.flink.statefun.playground.java.connectedcomponents.types;
+package org.apache.flink.statefun.playground.java.graphanalytics.types;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
@@ -18,7 +17,7 @@ public final class Types {
   }
 
   private static final ObjectMapper JSON_OBJ_MAPPER = new ObjectMapper();
-  private static final String TYPES_NAMESPACE = "connected-components.types";
+  private static final String TYPES_NAMESPACE = "graph-analytics.types";
 
   /**
    * Type denoting a new vertex coming from the input source.
@@ -45,12 +44,6 @@ public final class Types {
 //           JSON_OBJ_MAPPER::writeValueAsBytes,
 //           bytes -> JSON_OBJ_MAPPER.readValue(bytes, Set.class));
 
-  @SuppressWarnings("unchecked")
-  public static final Type<Map<Integer, List<Tuple2<Vertex, Long>>>> VERTEXMAP_TYPE =
-      SimpleType.simpleImmutableTypeFrom(
-          TypeName.typeNameOf(TYPES_NAMESPACE, "vertexMap"),
-          JSON_OBJ_MAPPER::writeValueAsBytes,
-          bytes -> JSON_OBJ_MAPPER.readValue(bytes, Map.class));
 
   @SuppressWarnings("unchecked")
   public static final Type<List<CustomTuple2<Integer, Long>>> IN_NEIGHBORS_TYPE =

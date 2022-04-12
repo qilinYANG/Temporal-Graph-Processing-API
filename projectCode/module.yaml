@@ -15,8 +15,8 @@
 
 kind: io.statefun.endpoints.v2/http
 spec:
-  functions: connected-components.fns/*
-  urlPathTemplate: http://connected-components-functions:1108/
+  functions: graph-analytics.fns/*
+  urlPathTemplate: http://graph-analytics-functions:1108/
   transport:
     type: io.statefun.transports.v1/async
 ---
@@ -28,6 +28,5 @@ kind: io.statefun.playground.v1/egress
 spec:
   port: 8091
   topics:
-    - connected-component-changes
     - incoming-edges
     - outgoing-edges

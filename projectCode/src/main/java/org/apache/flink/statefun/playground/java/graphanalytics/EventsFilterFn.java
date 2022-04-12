@@ -1,28 +1,18 @@
-package org.apache.flink.statefun.playground.java.connectedcomponents;
+package org.apache.flink.statefun.playground.java.graphanalytics;
 
-import static org.apache.flink.statefun.playground.java.connectedcomponents.types.Types.EGRESS_RECORD_JSON_TYPE;
-
-import java.time.Instant;
-import java.time.ZoneId;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import org.apache.flink.statefun.playground.java.connectedcomponents.types.EgressRecord;
-import org.apache.flink.statefun.playground.java.connectedcomponents.types.Types;
-import org.apache.flink.statefun.playground.java.connectedcomponents.types.Vertex;
-import org.apache.flink.statefun.playground.java.connectedcomponents.types.Execute;
-import org.apache.flink.statefun.playground.java.connectedcomponents.types.InEdgesQuery;
-import org.apache.flink.statefun.playground.java.connectedcomponents.types.OutEdgesQuery;
+
+import org.apache.flink.statefun.playground.java.graphanalytics.types.Types;
+import org.apache.flink.statefun.playground.java.graphanalytics.types.Vertex;
+import org.apache.flink.statefun.playground.java.graphanalytics.types.Execute;
+import org.apache.flink.statefun.playground.java.graphanalytics.types.InEdgesQuery;
+import org.apache.flink.statefun.playground.java.graphanalytics.types.OutEdgesQuery;
 import org.apache.flink.statefun.sdk.java.Context;
 import org.apache.flink.statefun.sdk.java.StatefulFunction;
 import org.apache.flink.statefun.sdk.java.StatefulFunctionSpec;
 import org.apache.flink.statefun.sdk.java.TypeName;
-import org.apache.flink.statefun.sdk.java.ValueSpec;
-import org.apache.flink.statefun.sdk.java.message.EgressMessageBuilder;
 import org.apache.flink.statefun.sdk.java.message.Message;
 import org.apache.flink.statefun.sdk.java.message.MessageBuilder;
-import org.apache.flink.api.java.tuple.Tuple2;
 
 
 /**
@@ -30,12 +20,11 @@ import org.apache.flink.api.java.tuple.Tuple2;
  * All requests are routed via the vertex route.
  * Different stateful function are dispatched depending on the task within the execute method.
  */
-final class ConnectedComponentsFn implements StatefulFunction {
-  static final TypeName TYPE_NAME = TypeName.typeNameOf("connected-components.fns", "vertex");
+final class EventsFilterFn implements StatefulFunction {
+  static final TypeName TYPE_NAME = TypeName.typeNameOf("graph-analytics.fns", "filter");
   static final StatefulFunctionSpec SPEC =
       StatefulFunctionSpec.builder(TYPE_NAME)
-          .withSupplier(ConnectedComponentsFn::new)
-          //.withValueSpecs(VERTEX_MAP)
+          .withSupplier(EventsFilterFn::new)
           .build();
 
   static final TypeName PLAYGROUND_EGRESS = TypeName.typeNameOf("io.statefun.playground", "egress");
