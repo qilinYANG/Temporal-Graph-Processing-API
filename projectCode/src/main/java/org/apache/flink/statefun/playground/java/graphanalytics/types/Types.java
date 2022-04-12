@@ -4,12 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.flink.statefun.sdk.java.TypeName;
 import org.apache.flink.statefun.sdk.java.types.SimpleType;
 import org.apache.flink.statefun.sdk.java.types.Type;
-import org.apache.flink.api.java.tuple.Tuple2;
 
 public final class Types {
 
@@ -36,13 +34,6 @@ public final class Types {
   public static final Type<Vertex> Add_IN_EDGE_TYPE = VERTEX_INIT_TYPE;
 
   public static final Type<Vertex> Add_OUT_EDGE_TYPE = VERTEX_INIT_TYPE;
-
-//   @SuppressWarnings("unchecked")
-//   public static final Type<Set<Integer>> NEIGHBOURS_TYPE =
-//       SimpleType.simpleImmutableTypeFrom(
-//           TypeName.typeNameOf(TYPES_NAMESPACE, "neighbours"),
-//           JSON_OBJ_MAPPER::writeValueAsBytes,
-//           bytes -> JSON_OBJ_MAPPER.readValue(bytes, Set.class));
 
 
   @SuppressWarnings("unchecked")

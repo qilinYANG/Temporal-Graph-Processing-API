@@ -27,7 +27,6 @@ final class EventsFilterFn implements StatefulFunction {
           .withSupplier(EventsFilterFn::new)
           .build();
 
-  static final TypeName PLAYGROUND_EGRESS = TypeName.typeNameOf("io.statefun.playground", "egress");
 
   @Override
   public CompletableFuture<Void> apply(Context context, Message message) {
