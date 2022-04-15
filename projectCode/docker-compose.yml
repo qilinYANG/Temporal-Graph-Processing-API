@@ -23,7 +23,7 @@ services:
   #    Functions service
   ###############################################################
 
-  connected-components-functions:
+  graph-analytics-functions:
     build:
       dockerfile: Dockerfile
       context: .
@@ -40,8 +40,7 @@ services:
       - "8081:8081"
       - "8090:8090"
       - "8091:8091"
-#      - "8092:8092"
     depends_on:
-      - connected-components-functions
+      - graph-analytics-functions
     volumes:
       - ./module.yaml:/module.yaml

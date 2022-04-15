@@ -1,16 +1,13 @@
-package org.apache.flink.statefun.playground.java.connectedcomponents.types;
+package org.apache.flink.statefun.playground.java.graphanalytics.types;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.flink.statefun.sdk.java.TypeName;
 import org.apache.flink.statefun.sdk.java.types.SimpleType;
 import org.apache.flink.statefun.sdk.java.types.Type;
-import org.apache.flink.api.java.tuple.Tuple2;
 
 public final class Types {
 
@@ -18,7 +15,7 @@ public final class Types {
   }
 
   private static final ObjectMapper JSON_OBJ_MAPPER = new ObjectMapper();
-  private static final String TYPES_NAMESPACE = "connected-components.types";
+  private static final String TYPES_NAMESPACE = "graph-analytics.types";
 
   /**
    * Type denoting a new vertex coming from the input source.
@@ -38,19 +35,6 @@ public final class Types {
 
   public static final Type<Vertex> Add_OUT_EDGE_TYPE = VERTEX_INIT_TYPE;
 
-//   @SuppressWarnings("unchecked")
-//   public static final Type<Set<Integer>> NEIGHBOURS_TYPE =
-//       SimpleType.simpleImmutableTypeFrom(
-//           TypeName.typeNameOf(TYPES_NAMESPACE, "neighbours"),
-//           JSON_OBJ_MAPPER::writeValueAsBytes,
-//           bytes -> JSON_OBJ_MAPPER.readValue(bytes, Set.class));
-
-  @SuppressWarnings("unchecked")
-  public static final Type<Map<Integer, List<Tuple2<Vertex, Long>>>> VERTEXMAP_TYPE =
-      SimpleType.simpleImmutableTypeFrom(
-          TypeName.typeNameOf(TYPES_NAMESPACE, "vertexMap"),
-          JSON_OBJ_MAPPER::writeValueAsBytes,
-          bytes -> JSON_OBJ_MAPPER.readValue(bytes, Map.class));
 
   @SuppressWarnings("unchecked")
   public static final Type<List<CustomTuple2<Integer, Long>>> IN_NEIGHBORS_TYPE =
@@ -79,6 +63,13 @@ public final class Types {
                   TypeName.typeNameOf(TYPES_NAMESPACE, "outEdgesQuery"),
                   JSON_OBJ_MAPPER::writeValueAsBytes,
                   bytes -> JSON_OBJ_MAPPER.readValue(bytes, OutEdgesQuery.class)
+          );
+
+  public static final Type<Execute> EXECUTE_TYPE =
+          SimpleType.simpleImmutableTypeFrom(
+                  TypeName.typeNameOf(TYPES_NAMESPACE, "execute"),
+                  JSON_OBJ_MAPPER::writeValueAsBytes,
+                  bytes -> JSON_OBJ_MAPPER.readValue(bytes, Execute.class)
           );
 
   public static final Type<EgressRecord> EGRESS_RECORD_JSON_TYPE =

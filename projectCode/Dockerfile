@@ -22,6 +22,6 @@ RUN mvn -f /usr/src/app/pom.xml clean package
 # ... and run the web server!
 FROM openjdk:8
 WORKDIR /
-COPY --from=builder /usr/src/app/target/connected-components-functions-app*jar-with-dependencies.jar connected-components-functions-app.jar
+COPY --from=builder /usr/src/app/target/graph-analytics-functions-app*jar-with-dependencies.jar graph-analytics-functions-app.jar
 EXPOSE 1108
-CMD java -jar connected-components-functions-app.jar
+CMD java -jar graph-analytics-functions-app.jar

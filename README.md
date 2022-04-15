@@ -18,10 +18,7 @@ The rotation of the meeting leader is:
 - Ardarsh
 - Aaron
 
-# 4
+# Project Code
+Project code is inside the `projectCode` folder, and inside that folder contains a [README](./projectCode/README.md) file with instructions on how to run the code.
 
-# 5
-
-# 6
-=======
 # [Design Document](./DESIGN.md)

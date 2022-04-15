@@ -1,4 +1,4 @@
-package org.apache.flink.statefun.playground.java.connectedcomponents;
+// package org.apache.flink.statefun.playground.java.connectedcomponents;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -12,7 +12,7 @@ import java.util.Scanner;
  * The app reads each line in text file and recursively send PUT request to the Undertow web server on ConnectedComponentsAppsServer;
  * therefore, the app has to be run in parallel with the docker-compose.
  */
-public class ConnectedComponentFilesApp {
+public class GraphAnalyticsFilesApp {
     public static void main(String[] args) throws Exception {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter file names in ./data folder: ");
@@ -24,15 +24,15 @@ public class ConnectedComponentFilesApp {
             String[] inputStr = scFiles.nextLine().trim().split(" ");
 
             //create connection to undertow server
-            String protocol = String.format("http://localhost:8090/connected-components.fns/vertex/%1$s", inputStr[0]);
+            String protocol = String.format("http://localhost:8090/graph-analytics.fns/filter/1");
 
             URL appServerUrl = new URL(protocol);
             HttpURLConnection con = (HttpURLConnection) appServerUrl.openConnection();
             con.setRequestMethod("PUT");
-            con.setRequestProperty("Content-Type", "application/vnd.connected-components.types/vertex");
+            con.setRequestProperty("Content-Type", "application/vnd.graph-analytics.types/execute");
             con.setDoOutput(true);
 
-            String jsonString = String.format("{\"src\": \"%1$s\", \"dst\": \"%2$s\", \"t\": \"%3$s\"}", inputStr[0], inputStr[1], inputStr[2]);
+            String jsonString = String.format("{\"task\": \"ADD\", \"src\": \"%1$s\", \"dst\": \"%2$s\", \"t\": \"%3$s\"}", inputStr[0], inputStr[1], inputStr[2]);
             System.out.println(jsonString);
 
             //write output to undertow web server
