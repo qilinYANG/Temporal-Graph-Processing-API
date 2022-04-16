@@ -1,6 +1,6 @@
 build:
 	docker-compose build
-	docker-compose up
+	docker-compose up -d
 
 rebuild:
 	docker-compose up --build
