@@ -1,0 +1,60 @@
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Arrays;
+
+public class LatencyTest {
+
+
+  /**
+   * Get the egress output corresponding with latency test
+   * @param url
+   * @return result: the response of the get request
+   * @throws Exception
+   */
+  public static String get(String url) throws Exception {
+    URL serverUrl = new URL(url);
+    HttpURLConnection con = (HttpURLConnection) serverUrl.openConnection();
+    con.setRequestMethod("GET");
+    int status = con.getResponseCode();
+    String result = "";
+    if (status == 200) {
+      BufferedReader in = new BufferedReader(
+          new InputStreamReader(con.getInputStream())
+      );
+      String inputLine;
+      StringBuffer content = new StringBuffer();
+      while ((inputLine = in.readLine()) != null) {
+        content.append(inputLine);
+      }
+      in.close();
+      result = content.toString();
+    }
+    // System.out.println(result);
+    return result;
+  }
+
+  public static void main(String[] args) throws Exception {
+    String filename = "latencyTest.txt";
+    FileWriter filewriter = new FileWriter(filename);
+    PrintWriter printWriter = new PrintWriter(filewriter);
+    String url = "http://localhost:8091/add-edge-latency";
+    long startTime = System.currentTimeMillis();
+    long maxPeriod = 1 * 1000 * 3;
+    // execute for a fixed period
+    while (System.currentTimeMillis() - startTime < maxPeriod) {
+      String egressOutput = get(url);
+      String[] parts = egressOutput.split(",");
+      // System.out.println(Arrays.toString(parts));
+      // we only need to record latency of one vertex as a representative
+      if (parts[0].equals("27")) {
+        printWriter.println(egressOutput);
+      }
+      // pull from egress every 100 milliseconds
+      Thread.sleep(100);
+    }
+    // close writer
+    printWriter.close();
+  }
+}

@@ -1,7 +1,9 @@
 package org.apache.flink.statefun.playground.java.graphanalytics;
 
+import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.flink.statefun.playground.java.graphanalytics.types.Types;
 import org.apache.flink.statefun.playground.java.graphanalytics.types.Vertex;
 import org.apache.flink.statefun.playground.java.graphanalytics.types.Execute;
@@ -33,16 +35,17 @@ final class EventsFilterFn implements StatefulFunction {
     if (message.is(Types.EXECUTE_TYPE)) {
       System.out.println("Received Request");
       final Execute request = message.as(Types.EXECUTE_TYPE);
+      // record the time the system started processing current event
+      long start = System.currentTimeMillis();
 
       if (request.getTask().equals("ADD")) {
         System.out.println("Adding Vertex");
-
         Vertex v = new Vertex(
                 request.getSrc(),
                 request.getDst(),
-                request.getTimestamp()
+                request.getTimestamp(),
+                start
         );
-
         context.send(
                 MessageBuilder.forAddress(InEdgesQueryFn.TYPE_NAME, String.valueOf(v.getDst()))
                         .withCustomType(Types.Add_IN_EDGE_TYPE, v)
@@ -55,7 +58,7 @@ final class EventsFilterFn implements StatefulFunction {
         );
       } else if (request.getTask().equals("GET_IN_EDGES")) {
         System.out.println("Fetching IN Edges");
-        InEdgesQuery inQuery = InEdgesQuery.create(request.getDst(), request.getTimestamp());
+        InEdgesQuery inQuery = InEdgesQuery.create(request.getDst(), request.getTimestamp(), start);
 
         context.send(
                 MessageBuilder.forAddress(InEdgesQueryFn.TYPE_NAME, String.valueOf(inQuery.getVertexId()))
@@ -64,7 +67,7 @@ final class EventsFilterFn implements StatefulFunction {
         );
       } else if (request.getTask().equals("GET_OUT_EDGES")) {
         System.out.println("Fetching OUT Edges");
-        OutEdgesQuery outQuery = OutEdgesQuery.create(request.getSrc(), request.getTimestamp());
+        OutEdgesQuery outQuery = OutEdgesQuery.create(request.getSrc(), request.getTimestamp(), start);
 
         context.send(
                 MessageBuilder.forAddress(OutEdgesQueryFn.TYPE_NAME, String.valueOf(outQuery.getVertexId()))

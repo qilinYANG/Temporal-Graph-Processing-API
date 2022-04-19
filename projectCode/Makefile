@@ -10,5 +10,10 @@ ingress:
 	java GraphAnalyticsFilesApp
 	make clean
 
+latency-test:
+	javac LatencyTest.java
+	java LatencyTest
+	make clean
+
 clean:
 	rm -rf *.class
