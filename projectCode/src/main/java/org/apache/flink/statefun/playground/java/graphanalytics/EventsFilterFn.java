@@ -2,11 +2,7 @@ package org.apache.flink.statefun.playground.java.graphanalytics;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.apache.flink.statefun.playground.java.graphanalytics.types.Types;
-import org.apache.flink.statefun.playground.java.graphanalytics.types.Vertex;
-import org.apache.flink.statefun.playground.java.graphanalytics.types.Execute;
-import org.apache.flink.statefun.playground.java.graphanalytics.types.InEdgesQuery;
-import org.apache.flink.statefun.playground.java.graphanalytics.types.OutEdgesQuery;
+import org.apache.flink.statefun.playground.java.graphanalytics.types.*;
 import org.apache.flink.statefun.sdk.java.Context;
 import org.apache.flink.statefun.sdk.java.StatefulFunction;
 import org.apache.flink.statefun.sdk.java.StatefulFunctionSpec;
@@ -71,7 +67,17 @@ final class EventsFilterFn implements StatefulFunction {
                         .withCustomType(Types.OUT_EDGES_QUERY_TYPE, outQuery)
                         .build()
         );
-      } else {
+      } else if (request.getTask().equals("GET_TWOHOP_EDGES")){
+          System.out.println("Fetching TwoHop Edges");
+          TwoHopQuery twoHopQuery = TwoHopQuery.create(request.getDst(), request.getTimestamp());
+
+          context.send(
+                  MessageBuilder.forAddress(TwoHopQueryFn.TYPE_NAME, String.valueOf(twoHopQuery.getVertexId()))
+                          .withCustomType(Types.Two_Hop_QUERY_TYPE, twoHopQuery)
+                          .build()
+          );
+      }
+      else {
         System.out.println("Unknown Query Type");
       }
     }

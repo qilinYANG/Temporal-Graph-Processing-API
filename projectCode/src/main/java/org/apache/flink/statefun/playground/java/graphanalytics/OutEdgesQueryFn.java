@@ -54,7 +54,7 @@ public class OutEdgesQueryFn implements StatefulFunction {
      * @param context
      * @return IN_NEIGHBORS
      */
-    private List<CustomTuple2<Integer, Long>> getCurrentOutNeighbors(Context context) {
+    public List<CustomTuple2<Integer, Long>> getCurrentOutNeighbors(Context context) {
         return context.storage().get(OUT_NEIGHBORS).orElse(new ArrayList<CustomTuple2<Integer, Long>>());
     }
 
@@ -65,7 +65,7 @@ public class OutEdgesQueryFn implements StatefulFunction {
      * @param vertex
      * @param currentOutNeighbors
      */
-    private void updateOutNeighbors(Context context, Vertex vertex, List<CustomTuple2<Integer, Long>> currentOutNeighbors) {
+    public void updateOutNeighbors(Context context, Vertex vertex, List<CustomTuple2<Integer, Long>> currentOutNeighbors) {
         CustomTuple2<Integer, Long> newOutNeighbor = CustomTuple2.createTuple2(vertex.getDst(), vertex.getTimestamp());
         // perform binary search to add incoming neighbor to the correct index, so that the IN_NEIGHBORS list remains
         // sorted by timestamp

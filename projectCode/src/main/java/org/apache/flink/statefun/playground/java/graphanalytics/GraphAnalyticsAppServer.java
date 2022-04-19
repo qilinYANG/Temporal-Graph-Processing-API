@@ -38,6 +38,7 @@ public final class GraphAnalyticsAppServer {
     functions.withStatefulFunction(EventsFilterFn.SPEC);
     functions.withStatefulFunction(InEdgesQueryFn.SPEC);
     functions.withStatefulFunction(OutEdgesQueryFn.SPEC);
+    functions.withStatefulFunction(TwoHopQueryFn.SPEC);
 
     final RequestReplyHandler requestReplyHandler = functions.requestReplyHandler();
     final Undertow httpServer =
