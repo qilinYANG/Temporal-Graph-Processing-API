@@ -11,17 +11,23 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class TwoHopQueryFn implements StatefulFunction {
-    private InEdgesQueryFn inEdgesQueryFn = new InEdgesQueryFn();
-    private OutEdgesQueryFn outEdgesQueryFn = new OutEdgesQueryFn();
+
+
+    private static final ValueSpec<List<CustomTuple2<Integer, Long>>> OUT_NEIGHBORS =
+            ValueSpec.named("outNeighbors").withCustomType(Types.OUT_NEIGHBORS_TYPE);
+
+    private static final ValueSpec<List<CustomTuple2<Integer, Long>>> IN_NEIGHBORS =
+            ValueSpec.named("inNeighbors").withCustomType(Types.IN_NEIGHBORS_TYPE);
 
     private static final ValueSpec<List<CustomTuple2<Integer, Long>>> TWOHOP_NEIGHBORS =
-            ValueSpec.named("twohopNeighbors").withCustomType(Types.TwoHop_NEIGHBORS_TYPE);
+            ValueSpec.named("TwoHopNeighbors").withCustomType(Types.TwoHop_NEIGHBORS_TYPE);
 
-    static final TypeName TYPE_NAME = TypeName.typeNameOf("graph-analytics.fns", "inEdges");
+
+    static final TypeName TYPE_NAME = TypeName.typeNameOf("graph-analytics.fns", "twoHopEdges");
     static final StatefulFunctionSpec SPEC =
             StatefulFunctionSpec.builder(TYPE_NAME)
-                    .withSupplier(InEdgesQueryFn::new)
-                    .withValueSpecs(TWOHOP_NEIGHBORS)
+                    .withSupplier(TwoHopQueryFn::new)
+                    .withValueSpecs(IN_NEIGHBORS,OUT_NEIGHBORS,TWOHOP_NEIGHBORS)
                     .build();
 
     static final TypeName EGRESS_TYPE = TypeName.typeNameOf("io.statefun.playground", "egress");
@@ -30,8 +36,10 @@ public class TwoHopQueryFn implements StatefulFunction {
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
         if (message.is(Types.VERTEX_INIT_TYPE)) {
             Vertex vertex = message.as(Types.VERTEX_INIT_TYPE);
-            List<CustomTuple2<Integer,Long>> currentTwoHopNeighbors = context.storage().get(TWOHOP_NEIGHBORS).orElse(new ArrayList<CustomTuple2<Integer, Long>>());
+            List<CustomTuple2<Integer,Long>> currentTwoHopNeighbors = getCurrentTwoHopNeighbors(context);
             updateTwoHopNeighbors(context,vertex,currentTwoHopNeighbors);
+        
+        
         } else if (message.is(Types.Two_Hop_QUERY_TYPE)){
             TwoHopQuery hopQuery = message.as(Types.Two_Hop_QUERY_TYPE);
             outputResult(context,hopQuery.getVertexId());
@@ -41,10 +49,24 @@ public class TwoHopQueryFn implements StatefulFunction {
     }
 
 
+    public List<CustomTuple2<Integer, Long>> getCurrentTwoHopNeighbors(Context context) {
+        return context.storage().get(TWOHOP_NEIGHBORS).orElse(new ArrayList<CustomTuple2<Integer, Long>>());
+    }
+
+    public List<CustomTuple2<Integer, Long>> getCurrentInNeighbors(Context context) {
+        return context.storage().get(IN_NEIGHBORS).orElse(new ArrayList<CustomTuple2<Integer, Long>>());
+    }
+
+
+    public List<CustomTuple2<Integer, Long>> getCurrentOutNeighbors(Context context) {
+        return context.storage().get(OUT_NEIGHBORS).orElse(new ArrayList<CustomTuple2<Integer, Long>>());
+    }
+
+
     public void updateTwoHopNeighbors(Context context, Vertex vertex, List<CustomTuple2<Integer, Long>> currentTwoHopNeighbors) {
-        List<CustomTuple2<Integer, Long>> currentInNeighbors = inEdgesQueryFn.getCurrentInNeighbors(context);
-        inEdgesQueryFn.updateInNeighbors(context, vertex, currentInNeighbors);
-        List<CustomTuple2<Integer,Long>> currentOutNeighbors = outEdgesQueryFn.getCurrentOutNeighbors(context);
+        List<CustomTuple2<Integer, Long>> currentInNeighbors = getCurrentInNeighbors(context);
+        updateInNeighbors(context, vertex, currentInNeighbors);
+
 
 
         for (CustomTuple2<Integer, Long> each : currentInNeighbors){
@@ -52,7 +74,9 @@ public class TwoHopQueryFn implements StatefulFunction {
             Long tsp = each.getField(1);
             if (src != vertex.getSrc()){
                 Vertex v = new Vertex(src,0,tsp);
-                outEdgesQueryFn.updateOutNeighbors(context,v,currentOutNeighbors);
+                List<CustomTuple2<Integer,Long>> currentOutNeighbors = getCurrentOutNeighbors(context);
+
+                updateOutNeighbors(context,v,currentOutNeighbors);
                 currentTwoHopNeighbors.addAll(currentOutNeighbors);
                 context.storage().set(TWOHOP_NEIGHBORS,currentTwoHopNeighbors);
             }
@@ -61,6 +85,56 @@ public class TwoHopQueryFn implements StatefulFunction {
         }
 
     }
+    public void updateOutNeighbors(Context context, Vertex vertex, List<CustomTuple2<Integer, Long>> currentOutNeighbors) {
+        CustomTuple2<Integer, Long> newOutNeighbor = CustomTuple2.createTuple2(vertex.getDst(), vertex.getTimestamp());
+        // perform binary search to add incoming neighbor to the correct index, so that the IN_NEIGHBORS list remains
+        // sorted by timestamp
+        int left = 0, right = currentOutNeighbors.size() - 1;
+        int insertIdx = 0;
+        while (left <= right) {
+            int mid = left + (right-left)/2;
+            Long t1 = currentOutNeighbors.get(mid).getField(1);
+            Long t2 = newOutNeighbor.getField(1);
+            int comparison = t1.compareTo(t2);
+            if (comparison == 0) {
+                insertIdx = mid;
+                break;
+            } else if (comparison < 0) {
+                left = mid + 1;
+                insertIdx = left;
+            } else {
+                right = mid - 1;
+            }
+        }
+        currentOutNeighbors.add(insertIdx, newOutNeighbor);
+        context.storage().set(OUT_NEIGHBORS, currentOutNeighbors);
+    }
+
+    public void updateInNeighbors(Context context, Vertex vertex, List<CustomTuple2<Integer, Long>> currentInNeighbors) {
+        CustomTuple2<Integer, Long> newInNeighbor = CustomTuple2.createTuple2(vertex.getSrc(), vertex.getTimestamp());
+        // perform binary search to add incoming neighbor to the correct index, so that the IN_NEIGHBORS list remains
+        // sorted by timestamp
+        int left = 0, right = currentInNeighbors.size() - 1;
+        int insertIdx = 0;
+        while (left <= right) {
+            int mid = left + (right-left)/2;
+            Long t1 = currentInNeighbors.get(mid).getField(1);
+            Long t2 = newInNeighbor.getField(1);
+            int comparison = t1.compareTo(t2);
+            if (comparison == 0) {
+                insertIdx = mid;
+                break;
+            } else if (comparison < 0) {
+                left = mid + 1;
+                insertIdx = left;
+            } else {
+                right = mid - 1;
+            }
+        }
+        currentInNeighbors.add(insertIdx, newInNeighbor);
+        context.storage().set(IN_NEIGHBORS, currentInNeighbors);
+    }
+
     private void outputResult(Context context, int vertexId) {
         List<CustomTuple2<Integer, Long>> TwoHopNeighbors =
                 context.storage().get(TWOHOP_NEIGHBORS).orElse(Collections.emptyList());

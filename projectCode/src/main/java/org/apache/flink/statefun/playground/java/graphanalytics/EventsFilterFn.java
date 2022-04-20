@@ -49,6 +49,13 @@ final class EventsFilterFn implements StatefulFunction {
                         .withCustomType(Types.Add_OUT_EDGE_TYPE, v)
                         .build()
         );
+
+
+        context.send(
+                MessageBuilder.forAddress(TwoHopQueryFn.TYPE_NAME, String.valueOf(v.getDst()))
+                        .withCustomType(Types.VERTEX_INIT_TYPE, v)
+                        .build()
+        );
       } else if (request.getTask().equals("GET_IN_EDGES")) {
         System.out.println("Fetching IN Edges");
         InEdgesQuery inQuery = InEdgesQuery.create(request.getDst(), request.getTimestamp());

@@ -57,7 +57,7 @@ public final class Types {
 
     public static final Type<TwoHopQuery> Two_Hop_QUERY_TYPE =
             SimpleType.simpleImmutableTypeFrom(
-                    TypeName.typeNameOf(TYPES_NAMESPACE, "twoHopEQuery"),
+                    TypeName.typeNameOf(TYPES_NAMESPACE, "twoHopQuery"),
                     JSON_OBJ_MAPPER::writeValueAsBytes,
                     bytes -> JSON_OBJ_MAPPER.readValue(bytes, TwoHopQuery.class)
             );
