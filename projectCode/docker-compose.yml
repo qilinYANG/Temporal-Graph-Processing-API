@@ -42,6 +42,7 @@ services:
       - graph-analytics-functions
     volumes:
       - ./module.yaml:/module.yaml
+      - ./conf:/opt/flink/conf
 
 # Unable to run all of these services at the same time
 
