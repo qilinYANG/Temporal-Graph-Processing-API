@@ -44,6 +44,7 @@ services:
       - graph-analytics-functions
     volumes:
       - ./module.yaml:/module.yaml
+      - ./conf:/opt/flink/conf
 
   ###############################################################
   #    Apache Kafka Broker (based on https://developer.confluent.io/quickstart/kafka-docker/)

@@ -14,21 +14,29 @@ public class OutEdgesQuery {
     @JsonProperty("t")
     private long timestamp;
 
+    // this variable is only used for latency experiment
+    @JsonProperty("start")
+    private long start;
+
     public OutEdgesQuery() {}
 
     /**
      * overloaded constructor
      * @param vertexId
      * @param timestamp
+     * @param start
      */
-    private OutEdgesQuery(int vertexId, long timestamp) {
+    private OutEdgesQuery(int vertexId, long timestamp, long start) {
         this.vertexId = vertexId;
         this.timestamp = timestamp;
+        this.start = start;
     }
 
     public int getVertexId() { return vertexId; }
 
     public long getTimestamp() { return timestamp; }
+
+    public long getStart() {return start;}
 
     /**
      * This method is used for creating a new InEdgesQuery, please call InEdgesQuery.create(vertex_id, timestamp)
@@ -36,9 +44,10 @@ public class OutEdgesQuery {
      *
      * @param vertexId
      * @param timestamp
+     * @param start
      * @return InEdgesQuery
      */
-    public static OutEdgesQuery create(int vertexId, long timestamp) {
-        return new OutEdgesQuery(vertexId, timestamp);
+    public static OutEdgesQuery create(int vertexId, long timestamp, long start) {
+        return new OutEdgesQuery(vertexId, timestamp, start);
     }
 }

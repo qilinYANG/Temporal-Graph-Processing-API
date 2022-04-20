@@ -23,12 +23,14 @@ public class InEdgesQueryFn implements StatefulFunction {
 
   private static final ValueSpec<List<CustomTuple2<Integer, Long>>> IN_NEIGHBORS =
       ValueSpec.named("inNeighbors").withCustomType(Types.IN_NEIGHBORS_TYPE);
+  private static ValueSpec<Integer> Add_Edge_Count = ValueSpec.named("addEdgeCount").withIntType();
+  private static ValueSpec<Integer> Query_Count = ValueSpec.named("queryCount").withIntType();
 
   static final TypeName TYPE_NAME = TypeName.typeNameOf("graph-analytics.fns", "inEdges");
   static final StatefulFunctionSpec SPEC =
       StatefulFunctionSpec.builder(TYPE_NAME)
           .withSupplier(InEdgesQueryFn::new)
-          .withValueSpecs(IN_NEIGHBORS)
+          .withValueSpecs(IN_NEIGHBORS, Add_Edge_Count, Query_Count)
           .build();
 
   static final TypeName EGRESS_TYPE = TypeName.typeNameOf("io.statefun.playground", "egress");
@@ -39,9 +41,15 @@ public class InEdgesQueryFn implements StatefulFunction {
       Vertex vertex = message.as(Types.Add_IN_EDGE_TYPE);
       List<CustomTuple2<Integer, Long>> currentInNeighbors = getCurrentInNeighbors(context);
       updateInNeighbors(context, vertex, currentInNeighbors);
+      updateEdgeAddCount(context);
+      long timeElapsed = System.currentTimeMillis() - vertex.getStart();
+      System.out.printf("vertex %s processed in-neighbor %s in %s ms\n", vertex.getDst(), vertex.getSrc(), timeElapsed);
       logInNeighbors(vertex.getDst(), context);
+      outputAddLatency(context, vertex.getDst(), timeElapsed);
     } else if (message.is(Types.IN_EDGES_QUERY_TYPE)) {
       InEdgesQuery query = message.as(Types.IN_EDGES_QUERY_TYPE);
+      updateQueryCount(context);
+      long timeElapsed = System.currentTimeMillis() - query.getStart();
       // the query we are implementing now is simple; it is only asking for all the incoming edges, so we can
       // just return the entire IN_NEIGHBORS list
       outputResult(context, query.getVertexId());
@@ -88,6 +96,37 @@ public class InEdgesQueryFn implements StatefulFunction {
     }
     currentInNeighbors.add(insertIdx, newInNeighbor);
     context.storage().set(IN_NEIGHBORS, currentInNeighbors);
+  }
+
+  /**
+   * update the number of in-edge addition received for the current vertex
+   *
+   * @param context
+   */
+  private void updateEdgeAddCount(Context context) {
+    int curCount = context.storage().get(Add_Edge_Count).orElse(0);
+    context.storage().set(Add_Edge_Count, curCount + 1);
+  }
+
+  /**
+   * update the number of in-edge query received for the current vertex
+   *
+   * @param context
+   */
+  private void updateQueryCount(Context context) {
+    int curCount = context.storage().get(Query_Count).orElse(0);
+    context.storage().set(Query_Count, curCount + 1);
+  }
+
+  private void outputAddLatency(Context context, int vertexId, long latency) {
+    int edgeCount = context.storage().get(Add_Edge_Count).orElse(0);
+    context.send(
+        EgressMessageBuilder.forEgress(EGRESS_TYPE)
+            .withCustomType(Types.EGRESS_RECORD_JSON_TYPE,
+                new EgressRecord("add-edge-latency",
+                    String.format("%d,%d,%d", vertexId, edgeCount, latency)))
+            .build()
+    );
   }
 
   /**
