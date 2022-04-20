@@ -40,15 +40,12 @@ public class LatencyTest {
     FileWriter filewriter = new FileWriter(filename);
     PrintWriter printWriter = new PrintWriter(filewriter);
     String url = "http://localhost:8091/add-edge-latency";
-    long startTime = System.currentTimeMillis();
-    long maxPeriod = 1 * 1000 * 3;
-    // execute for a fixed period
-    while (System.currentTimeMillis() - startTime < maxPeriod) {
-      String egressOutput = get(url);
+    String egressOutput;
+    while (!(egressOutput = get(url)).equals("")) {
       String[] parts = egressOutput.split(",");
       // System.out.println(Arrays.toString(parts));
       // we only need to record latency of one vertex as a representative
-      if (parts[0].equals("27")) {
+      if (parts[0].equals("1")) {
         printWriter.println(egressOutput);
       }
       // pull from egress every 100 milliseconds
