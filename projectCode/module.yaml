@@ -30,3 +30,4 @@ spec:
   topics:
     - incoming-edges
     - outgoing-edges
+    - TwoHop-Recommendation

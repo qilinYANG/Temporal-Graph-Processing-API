@@ -36,8 +36,8 @@ public class TwoHopQueryFn implements StatefulFunction {
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
         if (message.is(Types.VERTEX_INIT_TYPE)) {
             Vertex vertex = message.as(Types.VERTEX_INIT_TYPE);
-            List<CustomTuple2<Integer,Long>> currentTwoHopNeighbors = getCurrentTwoHopNeighbors(context);
-            updateTwoHopNeighbors(context,vertex,currentTwoHopNeighbors);
+//            List<CustomTuple2<Integer,Long>> currentTwoHopNeighbors = getCurrentTwoHopNeighbors(context);
+            updateTwoHopNeighbors(context,vertex);
         
         
         } else if (message.is(Types.Two_Hop_QUERY_TYPE)){
@@ -63,22 +63,28 @@ public class TwoHopQueryFn implements StatefulFunction {
     }
 
 
-    public void updateTwoHopNeighbors(Context context, Vertex vertex, List<CustomTuple2<Integer, Long>> currentTwoHopNeighbors) {
+    public void updateTwoHopNeighbors(Context context, Vertex vertex) {
         List<CustomTuple2<Integer, Long>> currentInNeighbors = getCurrentInNeighbors(context);
         updateInNeighbors(context, vertex, currentInNeighbors);
+        List<CustomTuple2<Integer,Long>> currentOutNeighbors = getCurrentOutNeighbors(context);
 
 
-
+//        String s = String.format("current incoming neighbots: %s", currentInNeighbors);
+//        System.out.println(s);
         for (CustomTuple2<Integer, Long> each : currentInNeighbors){
             Integer src = each.getField(0);
             Long tsp = each.getField(1);
-            if (src != vertex.getSrc()){
-                Vertex v = new Vertex(src,0,tsp);
-                List<CustomTuple2<Integer,Long>> currentOutNeighbors = getCurrentOutNeighbors(context);
+            if (!src.equals(vertex.getSrc())){
+
+                List<CustomTuple2<Integer,Long>> currentTwoHopNeighbors = getCurrentTwoHopNeighbors(context);
+                Vertex v = new Vertex(src,src,tsp);
+
 
                 updateOutNeighbors(context,v,currentOutNeighbors);
                 currentTwoHopNeighbors.addAll(currentOutNeighbors);
                 context.storage().set(TWOHOP_NEIGHBORS,currentTwoHopNeighbors);
+                String s = String.format("current twoHop neighbors: %s", currentTwoHopNeighbors);
+                System.out.println(s);
             }
 
 
