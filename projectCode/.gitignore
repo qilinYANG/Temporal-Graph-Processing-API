@@ -1,2 +1,4 @@
 # java class files
 target/
+latencyTest.txt
+latencyTest_linear.txt
