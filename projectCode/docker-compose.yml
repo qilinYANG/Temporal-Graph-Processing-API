@@ -32,8 +32,19 @@ services:
   #    StateFun runtime
   ###############################################################
 
+#  statefun:
+#    image: apache/flink-statefun-playground:3.2.0-1.0
+#    ports:
+#      - "8081:8081"
+#      - "8090:8090"
+#      - "8091:8091"
+#    depends_on:
+#      - graph-analytics-functions
+#    volumes:
+#      - ./module.yaml:/module.yaml
+
   statefun:
-    image: apache/flink-statefun-playground:3.2.0-1.0
+    image: mikegzy/cs551-project:1.0
     ports:
       - "8081:8081"
       - "8090:8090"
@@ -42,7 +53,6 @@ services:
       - graph-analytics-functions
     volumes:
       - ./module.yaml:/module.yaml
-      - ./conf:/opt/flink/conf
 
 # Unable to run all of these services at the same time
 
