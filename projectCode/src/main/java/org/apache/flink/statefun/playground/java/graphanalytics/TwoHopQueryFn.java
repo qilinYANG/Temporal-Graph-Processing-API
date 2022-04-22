@@ -4,6 +4,7 @@ import org.apache.flink.statefun.playground.java.graphanalytics.types.*;
 import org.apache.flink.statefun.sdk.java.*;
 import org.apache.flink.statefun.sdk.java.message.EgressMessageBuilder;
 import org.apache.flink.statefun.sdk.java.message.Message;
+import org.apache.flink.statefun.sdk.java.message.MessageBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,10 +44,13 @@ public class TwoHopQueryFn implements StatefulFunction {
         } else if (message.is(Types.Two_Hop_QUERY_TYPE)){
             TwoHopQuery hopQuery = message.as(Types.Two_Hop_QUERY_TYPE);
             outputResult(context,hopQuery.getVertexId());
+
         }
 
         return context.done();
+
     }
+
 
 
     public List<CustomTuple2<Integer, Long>> getCurrentTwoHopNeighbors(Context context) {
@@ -64,27 +68,42 @@ public class TwoHopQueryFn implements StatefulFunction {
 
 
     public void updateTwoHopNeighbors(Context context, Vertex vertex) {
+
+
         List<CustomTuple2<Integer, Long>> currentInNeighbors = getCurrentInNeighbors(context);
-        updateInNeighbors(context, vertex, currentInNeighbors);
+
+        updateInNeighbors(context,vertex,currentInNeighbors);
+
+
+        String s = String.format("vertex %s current incoming neighbots: %s", vertex.getDst(),currentInNeighbors);
+        System.out.println(s);
+
         List<CustomTuple2<Integer,Long>> currentOutNeighbors = getCurrentOutNeighbors(context);
-
-
-//        String s = String.format("current incoming neighbots: %s", currentInNeighbors);
-//        System.out.println(s);
+        updateOutNeighbors(context,vertex,currentOutNeighbors);
+        String s1 = String.format("vertex %s current outgoing neighbots: %s", vertex.getSrc(),currentOutNeighbors);
+        System.out.println(s1);
         for (CustomTuple2<Integer, Long> each : currentInNeighbors){
             Integer src = each.getField(0);
             Long tsp = each.getField(1);
             if (!src.equals(vertex.getSrc())){
 
+
+                OutEdgesQuery outQuery = OutEdgesQuery.create(src, tsp);
+
+                context.send(
+                        MessageBuilder.forAddress(OutEdgesQueryFn.TYPE_NAME, String.valueOf(outQuery.getVertexId()))
+                                .withCustomType(Types.OUT_EDGES_QUERY_TYPE, outQuery)
+                                .build()
+                );
+
+
+
+
                 List<CustomTuple2<Integer,Long>> currentTwoHopNeighbors = getCurrentTwoHopNeighbors(context);
-                Vertex v = new Vertex(src,src,tsp);
-
-
-                updateOutNeighbors(context,v,currentOutNeighbors);
-                currentTwoHopNeighbors.addAll(currentOutNeighbors);
+                currentTwoHopNeighbors.addAll(getCurrentOutNeighbors(context));
                 context.storage().set(TWOHOP_NEIGHBORS,currentTwoHopNeighbors);
-                String s = String.format("current twoHop neighbors: %s", currentTwoHopNeighbors);
-                System.out.println(s);
+                String twohop = String.format("current twoHop neighbors: %s", currentTwoHopNeighbors);
+                System.out.println(twohop);
             }
 
 

@@ -22,6 +22,14 @@ public class TwoHopQuery {
         this.timestamp = timestamp;
     }
 
+    public void setVertexId(int vertexId) {
+        this.vertexId = vertexId;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
     public int getVertexId() { return vertexId; }
 
     public long getTimestamp() { return timestamp; }

@@ -39,7 +39,7 @@ public class OutEdgesQueryFn implements StatefulFunction {
             Vertex vertex = message.as(Types.Add_OUT_EDGE_TYPE);
             List<CustomTuple2<Integer, Long>> currentOutNeighbors = getCurrentOutNeighbors(context);
             updateOutNeighbors(context, vertex, currentOutNeighbors);
-            logOutNeighbors(vertex.getSrc(), context);
+//            logOutNeighbors(vertex.getSrc(), context);
         } else if (message.is(Types.OUT_EDGES_QUERY_TYPE)) {
             OutEdgesQuery query = message.as(Types.OUT_EDGES_QUERY_TYPE);
             // the query we are implementing now is simple; it is only asking for all the incoming edges, so we can
