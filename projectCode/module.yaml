@@ -19,6 +19,9 @@ spec:
   urlPathTemplate: http://graph-analytics-functions:1108/
   transport:
     type: io.statefun.transports.v1/async
+    call: 15min
+    connect: 10min
+
 ---
 kind: io.statefun.playground.v1/ingress
 spec:

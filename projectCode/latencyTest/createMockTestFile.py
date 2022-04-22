@@ -3,7 +3,7 @@
 def createTestFile(filename):
 	timestamp = 1000000000
 	with open(filename, 'w') as f:
-		for i in range(2, 100002):
+		for i in range(2, 20002):
 			f.write(f'1 1 {timestamp}\n')
 			timestamp += 1
 

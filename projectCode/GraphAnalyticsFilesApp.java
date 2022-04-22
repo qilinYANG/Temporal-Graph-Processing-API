@@ -43,7 +43,7 @@ public class GraphAnalyticsFilesApp {
 
             int responseCode = con.getResponseCode();
             System.out.println(responseCode + "\n");
-            Thread.sleep(10);
+            Thread.sleep(5);
         }
     }
 
