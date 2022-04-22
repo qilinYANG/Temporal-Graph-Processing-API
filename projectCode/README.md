@@ -41,7 +41,7 @@ The query topic can be `incoming-edges` or `outgoing-edges` depending on what qu
 The Kafka is set up according to this [guide](https://developer.confluent.io/quickstart/kafka-docker/), which is set up through `docker-compose`; therefore, by running `docker-compose`, it will automatically set up the broker. After `docker-compose up -d`, topics have to be created since at the moment, automatic topics creation during start up is not set up yet. Run the follow commands to manually create topics:
 ```
 docker exec broker \
-kafka-topics --bootstrap-server broker:9092 \
+kafka-topics --bootstrap-server 127.0.0.1:9092 \
              --create \
              --topic quickstart
 ```
@@ -67,4 +67,11 @@ docker exec --interactive --tty broker \
 kafka-console-consumer --bootstrap-server broker:9092 \
                        --topic quickstart \
                        --from-beginning
+```
+
+**To list the topics in Kafka:** <br>
+```
+docker exec broker \
+kafka-topics --bootstrap-server broker:9092 \
+             --list
 ```

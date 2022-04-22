@@ -10,6 +10,9 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 
+/**
+ * KafkaProducerApp sends line by line of a textfile to Kafka
+ */
 public class KafkaProducerApp {
     public static void main(String[] args) throws Exception {
         final String topicName = "quickstart";
