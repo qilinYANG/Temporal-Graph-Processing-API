@@ -45,6 +45,7 @@ services:
 #      - ./module.yaml:/module.yaml
 
   statefun:
+    container_name: statefun
     image: mikegzy/cs551-project:1.0
     ports:
       - "8081:8081"
@@ -52,6 +53,7 @@ services:
       - "8091:8091"
     depends_on:
       - graph-analytics-functions
+      - broker
     volumes:
       - ./module.yaml:/module.yaml
 
@@ -88,3 +90,21 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+      KAFKA_ADVERTISED_HOST_NAME: "broker"
+
+  ###############################################################
+  #   Kafka Producer (using the Producer API from Kafka)
+  ###############################################################\
+
+  producer:
+    container_name: producer
+    build:
+      dockerfile: Dockerfile_producer
+      context: .
+    depends_on:
+      - graph-analytics-functions
+      - broker
+      - statefun
+    environment:
+      BROKER_ADDRESS: broker
+      BROKER_ADDRESS_PORT: 9092

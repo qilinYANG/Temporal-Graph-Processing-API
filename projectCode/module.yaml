@@ -34,3 +34,19 @@ spec:
     - incoming-edges
     - outgoing-edges
     - add-edge-latency
+---
+kind: io.statefun.kafka.v1/ingress
+spec:
+  id: graph-analytics/filters
+  address: broker:9092
+  consumerGroupId: graph-analytics.io
+  startupPosition:
+    type: earliest
+  deliverySemantic:
+    type: exactly-once
+    transactionTimeoutMillis: 15min
+  topics:
+    - topic: quickstart
+      valueType: graph-analytics.types/execute
+      targets:
+        - graph-analytics.fns/filter
