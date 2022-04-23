@@ -34,6 +34,7 @@ import org.apache.flink.statefun.sdk.java.handler.RequestReplyHandler;
 public final class GraphAnalyticsAppServer {
 
   public static void main(String[] args) {
+    System.out.println("Starting Graph Analytics Web Server...");
     final StatefulFunctions functions = new StatefulFunctions();
     functions.withStatefulFunction(EventsFilterFn.SPEC);
     functions.withStatefulFunction(InEdgesQueryFn.SPEC);
@@ -46,5 +47,6 @@ public final class GraphAnalyticsAppServer {
             .setHandler(new UndertowHttpHandler(requestReplyHandler))
             .build();
     httpServer.start();
+    System.out.println("Web server started successfully!");
   }
 }

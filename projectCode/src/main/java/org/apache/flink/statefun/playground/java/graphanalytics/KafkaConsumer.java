@@ -11,15 +11,17 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
  * KafkaConsumer is a data source that will retrieve topics/requests from Kafka.
  * This is done so that we don't lose any message and the message will be sent in order.
  * 
- * Not tested yet
+ * This is created using the DataStream API, not the Stateful Funcs API (not sure if it'll work)
  */
 public class KafkaConsumer {
     public static void main(String[] args) throws Exception {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        
-        String bootstrapServer = "localhost:9092";
+
+        final String bootstrapServer = System.getenv("BROKER_ADDRESS");
+        final String bootstrapServerPort = System.getenv("BROKER_ADDRESS_PORT");
+        System.out.println(bootstrapServer);
         KafkaSource<String> source = KafkaSource.<String>builder()
-            .setBootstrapServers(bootstrapServer)
+            .setBootstrapServers(String.format("%s:%s", bootstrapServer, bootstrapServerPort))
             .setTopics("quickstart")
             .setGroupId("flinkapp")
             .setStartingOffsets(OffsetsInitializer.earliest())
@@ -31,5 +33,4 @@ public class KafkaConsumer {
 
         env.execute("Consume events from Kafka");
     }
-    
 }
