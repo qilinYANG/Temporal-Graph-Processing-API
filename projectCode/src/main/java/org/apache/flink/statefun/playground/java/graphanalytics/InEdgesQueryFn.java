@@ -2,6 +2,7 @@ package org.apache.flink.statefun.playground.java.graphanalytics;
 
 import org.apache.flink.statefun.playground.java.graphanalytics.types.*;
 import org.apache.flink.statefun.sdk.java.*;
+import org.apache.flink.statefun.sdk.java.io.KafkaEgressMessage;
 import org.apache.flink.statefun.sdk.java.message.EgressMessageBuilder;
 import org.apache.flink.statefun.sdk.java.message.Message;
 
@@ -33,7 +34,7 @@ public class InEdgesQueryFn implements StatefulFunction {
           .withValueSpecs(IN_NEIGHBORS, Add_Edge_Count, Query_Count)
           .build();
 
-  static final TypeName EGRESS_TYPE = TypeName.typeNameOf("io.statefun.playground", "egress");
+  static final TypeName EGRESS_TYPE = TypeName.typeNameOf("graph-analytics.io", "egress");
 
   @Override
   public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
@@ -120,11 +121,17 @@ public class InEdgesQueryFn implements StatefulFunction {
 
   private void outputAddLatency(Context context, int vertexId, long latency) {
     int edgeCount = context.storage().get(Add_Edge_Count).orElse(0);
+//    context.send(
+//        EgressMessageBuilder.forEgress(EGRESS_TYPE)
+//            .withCustomType(Types.EGRESS_RECORD_JSON_TYPE,
+//                new EgressRecord("add-edge-latency",
+//                    String.format("%d,%d,%d", vertexId, edgeCount, latency)))
+//            .build()
+//    );
     context.send(
-        EgressMessageBuilder.forEgress(EGRESS_TYPE)
-            .withCustomType(Types.EGRESS_RECORD_JSON_TYPE,
-                new EgressRecord("add-edge-latency",
-                    String.format("%d,%d,%d", vertexId, edgeCount, latency)))
+        KafkaEgressMessage.forEgress(EGRESS_TYPE)
+            .withTopic("add-edge-latency")
+            .withUtf8Value(String.format("latency after adding %d edges to vertex %d is %d\n", edgeCount, vertexId, latency))
             .build()
     );
   }
@@ -138,11 +145,18 @@ public class InEdgesQueryFn implements StatefulFunction {
     List<CustomTuple2<Integer, Long>> currentInNeighbors =
         context.storage().get(IN_NEIGHBORS).orElse(Collections.emptyList());
 
+//    context.send(
+//        EgressMessageBuilder.forEgress(EGRESS_TYPE)
+//            .withCustomType(Types.EGRESS_RECORD_JSON_TYPE,
+//                new EgressRecord("incoming-edges",
+//                    String.format("The incoming edges of vertex %s are %s", vertexId, currentInNeighbors)))
+//            .build()
+//    );
     context.send(
-        EgressMessageBuilder.forEgress(EGRESS_TYPE)
-            .withCustomType(Types.EGRESS_RECORD_JSON_TYPE,
-                new EgressRecord("incoming-edges",
-                    String.format("The incoming edges of vertex %s are %s", vertexId, currentInNeighbors)))
+        KafkaEgressMessage.forEgress(EGRESS_TYPE)
+            .withTopic("incoming-edges")
+            .withUtf8Key(String.valueOf(vertexId))
+            .withUtf8Value(String.format("the incoming edges of vertex %d are %s\n", vertexId, currentInNeighbors))
             .build()
     );
   }
