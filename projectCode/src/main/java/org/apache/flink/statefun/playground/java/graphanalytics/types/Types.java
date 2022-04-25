@@ -37,14 +37,13 @@ public final class Types {
   public static final Type<Vertex> Add_OUT_EDGE_TYPE = VERTEX_INIT_TYPE;
 
 
-  @SuppressWarnings("unchecked")
 
-  public static final Type<List<CustomTuple2<Integer, Long>>> TwoHop_NEIGHBORS_TYPE =
-          SimpleType.simpleImmutableTypeFrom(
-                  TypeName.typeNameOf(TYPES_NAMESPACE, "TwoHopNeighbors"),
-                  JSON_OBJ_MAPPER::writeValueAsBytes,
-                  bytes -> JSON_OBJ_MAPPER.readValue(bytes, new TypeReference<List<CustomTuple2<Integer,Long>>>() {})
-          );
+//  public static final Type<List<CustomTuple2<Integer, Long>>> TwoHop_NEIGHBORS_TYPE =
+//          SimpleType.simpleImmutableTypeFrom(
+//                  TypeName.typeNameOf(TYPES_NAMESPACE, "TwoHopNeighbors"),
+//                  JSON_OBJ_MAPPER::writeValueAsBytes,
+//                  bytes -> JSON_OBJ_MAPPER.readValue(bytes, new TypeReference<List<CustomTuple2<Integer,Long>>>() {})
+//          );
 
 
   public static final Type<List<CustomTuple2<Integer, Long>>> IN_NEIGHBORS_TYPE =
@@ -55,12 +54,19 @@ public final class Types {
       );
 
 
-    public static final Type<TwoHopQuery> Two_Hop_QUERY_TYPE =
-            SimpleType.simpleImmutableTypeFrom(
-                    TypeName.typeNameOf(TYPES_NAMESPACE, "twoHopQuery"),
-                    JSON_OBJ_MAPPER::writeValueAsBytes,
-                    bytes -> JSON_OBJ_MAPPER.readValue(bytes, TwoHopQuery.class)
-            );
+  public static final Type<TwoHopQuery> TWO_HOP_QUERY_TYPE =
+          SimpleType.simpleImmutableTypeFrom(
+                  TypeName.typeNameOf(TYPES_NAMESPACE, "twoHopQuery"),
+                  JSON_OBJ_MAPPER::writeValueAsBytes,
+                  bytes -> JSON_OBJ_MAPPER.readValue(bytes, TwoHopQuery.class)
+          );
+
+  public static final Type<Set<Integer>> RECOMMEND_SET_TYPE =
+      SimpleType.simpleImmutableTypeFrom(
+          TypeName.typeNameOf(TYPES_NAMESPACE, "recommendSet"),
+          JSON_OBJ_MAPPER::writeValueAsBytes,
+          bytes -> JSON_OBJ_MAPPER.readValue(bytes, Set.class)
+      );
 
   public static final Type<InEdgesQuery> IN_EDGES_QUERY_TYPE =
       SimpleType.simpleImmutableTypeFrom(
