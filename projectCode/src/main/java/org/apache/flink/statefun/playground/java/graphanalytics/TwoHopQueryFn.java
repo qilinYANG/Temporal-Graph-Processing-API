@@ -14,11 +14,7 @@ import java.util.concurrent.CompletableFuture;
 public class TwoHopQueryFn implements StatefulFunction {
 
 
-    private static final ValueSpec<List<CustomTuple2<Integer, Long>>> OUT_NEIGHBORS =
-            ValueSpec.named("outNeighbors").withCustomType(Types.OUT_NEIGHBORS_TYPE);
 
-    private static final ValueSpec<List<CustomTuple2<Integer, Long>>> IN_NEIGHBORS =
-            ValueSpec.named("inNeighbors").withCustomType(Types.IN_NEIGHBORS_TYPE);
 
     private static final ValueSpec<List<CustomTuple2<Integer, Long>>> TWOHOP_NEIGHBORS =
             ValueSpec.named("TwoHopNeighbors").withCustomType(Types.TwoHop_NEIGHBORS_TYPE);
@@ -28,7 +24,7 @@ public class TwoHopQueryFn implements StatefulFunction {
     static final StatefulFunctionSpec SPEC =
             StatefulFunctionSpec.builder(TYPE_NAME)
                     .withSupplier(TwoHopQueryFn::new)
-                    .withValueSpecs(IN_NEIGHBORS,OUT_NEIGHBORS,TWOHOP_NEIGHBORS)
+                    .withValueSpecs(TWOHOP_NEIGHBORS)
                     .build();
 
     static final TypeName EGRESS_TYPE = TypeName.typeNameOf("io.statefun.playground", "egress");
@@ -70,7 +66,7 @@ public class TwoHopQueryFn implements StatefulFunction {
     public void updateTwoHopNeighbors(Context context, Vertex vertex) {
 
 
-        List<CustomTuple2<Integer, Long>> currentInNeighbors = getCurrentInNeighbors(context);
+        List<CustomTuple2<Integer, Long>> currentInNeighbors = context.storage().get(In);
 
         updateInNeighbors(context,vertex,currentInNeighbors);
 
