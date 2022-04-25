@@ -38,7 +38,7 @@ spec:
 kind: io.statefun.kafka.v1/ingress
 spec:
   id: graph-analytics.io/filters
-  address: broker:9092
+  address: broker:29092
   consumerGroupId: graph-analytics
   startupPosition:
     type: earliest

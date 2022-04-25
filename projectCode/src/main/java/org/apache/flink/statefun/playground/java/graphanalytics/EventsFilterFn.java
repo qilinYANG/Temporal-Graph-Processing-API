@@ -1,20 +1,14 @@
 package org.apache.flink.statefun.playground.java.graphanalytics;
 
-import java.time.Instant;
-import java.util.concurrent.CompletableFuture;
-
-import org.apache.commons.lang3.time.StopWatch;
-import org.apache.flink.statefun.playground.java.graphanalytics.types.Types;
-import org.apache.flink.statefun.playground.java.graphanalytics.types.Vertex;
-import org.apache.flink.statefun.playground.java.graphanalytics.types.Execute;
-import org.apache.flink.statefun.playground.java.graphanalytics.types.InEdgesQuery;
-import org.apache.flink.statefun.playground.java.graphanalytics.types.OutEdgesQuery;
+import org.apache.flink.statefun.playground.java.graphanalytics.types.*;
 import org.apache.flink.statefun.sdk.java.Context;
 import org.apache.flink.statefun.sdk.java.StatefulFunction;
 import org.apache.flink.statefun.sdk.java.StatefulFunctionSpec;
 import org.apache.flink.statefun.sdk.java.TypeName;
 import org.apache.flink.statefun.sdk.java.message.Message;
 import org.apache.flink.statefun.sdk.java.message.MessageBuilder;
+
+import java.util.concurrent.CompletableFuture;
 
 
 /**

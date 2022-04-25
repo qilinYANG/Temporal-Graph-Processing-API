@@ -20,9 +20,8 @@ services:
   ###############################################################
   #    Functions service
   ###############################################################
-
   graph-analytics-functions:
-    container_name: graph-analytics
+    container_name: graph-analytics-functions
     build:
       dockerfile: Dockerfile
       context: .
@@ -32,18 +31,6 @@ services:
   ###############################################################
   #    StateFun runtime
   ###############################################################
-
-#  statefun:
-#    image: apache/flink-statefun-playground:3.2.0-1.0
-#    ports:
-#      - "8081:8081"
-#      - "8090:8090"
-#      - "8091:8091"
-#    depends_on:
-#      - graph-analytics-functions
-#    volumes:
-#      - ./module.yaml:/module.yaml
-
   statefun:
     container_name: statefun
     image: mikegzy/cs551-project:1.0
@@ -58,7 +45,7 @@ services:
       - ./module.yaml:/module.yaml
 
   ###############################################################
-  #    Apache Kafka Broker (based on https://developer.confluent.io/quickstart/kafka-docker/)
+  #    Apache Kafka (based on https://developer.confluent.io/quickstart/kafka-docker/)
   ###############################################################
   zookeeper:
     image: confluentinc/cp-zookeeper:latest.arm64
@@ -76,26 +63,25 @@ services:
       # To learn about configuring Kafka for access across networks see
       # https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
       - "9092:9092"
+    expose:
+      - 29092
     depends_on:
       - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_INTER_BROKER_LISTENER_NAME: EXTERNAL
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT
-      KAFKA_LISTENERS: EXTERNAL://broker:9092
-      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://broker:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT, EXTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: EXTERNAL://broker:9092, INTERNAL://broker:29092
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:9092, INTERNAL://broker:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 100
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
-      KAFKA_ADVERTISED_HOST_NAME: "broker"
 
   ###############################################################
   #   Kafka Producer (using the Producer API from Kafka)
-  ###############################################################\
-
+  ###############################################################
   producer:
     container_name: producer
     build:
@@ -107,4 +93,4 @@ services:
       - statefun
     environment:
       BROKER_ADDRESS: broker
-      BROKER_ADDRESS_PORT: 9092
+      BROKER_ADDRESS_PORT: 29092

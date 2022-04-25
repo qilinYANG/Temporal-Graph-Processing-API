@@ -33,7 +33,7 @@ The query topic can be `incoming-edges` or `outgoing-edges` depending on what qu
 * `src/` contains all the source code, and `src/.../types` contains the types we use (eg. `CustomTuple2` and `Vertex` classes)
 * `GraphAnalyticsFilesApp.java` contains code to read from an ingress file rather than requiring us to manually input `CURL` commands from the terminal
 * `src/.../GraphAnalyticsAppServer.java`: contains the `Undertow` server that listens for requests
-* `src/.../InEdgesQueryFn.java`: contains the query code for counting incoming edges
+* `src/.../InEdgbroker:esQueryFn.java`: contains the query code for counting incoming edges
 * `src/.../OutEdgesQueryFn.java`: contains the query code for counting outgoing edges
 * `src/.../EventsFilterFn`: contains the code of our main event handler function
 
@@ -41,7 +41,7 @@ The query topic can be `incoming-edges` or `outgoing-edges` depending on what qu
 The Kafka is set up according to this [guide](https://developer.confluent.io/quickstart/kafka-docker/), which is set up through `docker-compose`; therefore, by running `docker-compose`, it will automatically set up the broker. After `docker-compose up -d`, topics have to be created since at the moment, automatic topics creation during start up is not set up yet. Run the follow commands to manually create topics:
 ```
 docker exec broker \
-kafka-topics --bootstrap-server broker:9092 \
+kafka-topics --bootstrap-server broker:29092 \
              --create \
              --topic quickstart
 ```
@@ -50,7 +50,7 @@ kafka-topics --bootstrap-server broker:9092 \
 To write message to Kafka topic, we'll done it through kafka-console-producer command line tool. This is good for testing it out but during simulation, we'll be using Kafka Connect/Producer API to read textfiles to send graph edges to Flink Application. For sending single message, we can write the following in the terminal:
 ```
 docker exec --interactive --tty broker \
-kafka-console-producer --bootstrap-server broker:9092 \
+kafka-console-producer --bootstrap-server broker:29092 \
                        --topic quickstart
 ```
 Then you can write messages:
@@ -64,7 +64,7 @@ this is my third kafka message. I’m on a roll :-D
 To read messages from a "quickstart" topic:
 ```
 docker exec --interactive --tty broker \
-kafka-console-consumer --bootstrap-server broker:9092 \
+kafka-console-consumer --bootstrap-server broker:29092 \
                        --topic quickstart \
                        --from-beginning
 ```
@@ -72,6 +72,11 @@ kafka-console-consumer --bootstrap-server broker:9092 \
 **To list the topics in Kafka:** <br>
 ```
 docker exec broker \
-kafka-topics --bootstrap-server broker:9092 \
+kafka-topics --bootstrap-server broker:29092 \
              --list
+```
+
+**To request for metadata from the broker inside the docker:**
+```
+docker run -it --rm --network=projectcode_default edenhill/kcat:1.7.1 -b broker:29092 -L
 ```
