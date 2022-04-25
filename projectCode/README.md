@@ -4,8 +4,8 @@ This is the source code for project 6.
 #### Installation and instructions to run
 * from the root directory of the source code, run `cd projectCode` to go into the actual source directory (if you are already inside the projectCode directory, you can skip this step)
 * run `make` to build and run the stateful functions
-* to test the automatic ingress feature, open a new terminal window and run `make ingress` to compile and run the feature
-* type `sx-mathoverflow-test.txt` to automatically read and import the test ingress events from the `../data` folder , note the changes in the terminal on the Flink app
+* open Docker Desktop and click `graph-analytics` to see messages being sent and received
+
 #### Running Queries
 Currently, the queries have to be sent through http requests manually. We will provide easier ways to run queries in the future.
 To retrieve the number of incoming edges of a vertex, send a request like this:
