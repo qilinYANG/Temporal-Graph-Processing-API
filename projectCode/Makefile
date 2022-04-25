@@ -1,6 +1,10 @@
-build:
+kafka-terminal:
 	docker-compose build
 	docker-compose up
+
+build:
+	docker-compose build
+	docker-compose up -d
 
 rebuild:
 	docker-compose up --build
