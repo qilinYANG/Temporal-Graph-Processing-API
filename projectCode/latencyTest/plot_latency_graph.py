@@ -50,6 +50,18 @@ def plotGraphComparison(result_ls, result_bs):
 	plt.savefig('add_edge_latency_comparison.png')
 
 
+def plotLatencyCDF(result, savefile='cdf_graph.png'):
+	latency = result[:, 2]
+	sorted_latency = np.sort(latency)
+	sorted_latency = np.insert(sorted_latency, 0, 0)
+	cdf = 1. * np.arange(len(sorted_latency)) / (len(sorted_latency) - 1)
+	plt.figure(figsize=(15,7))
+	plt.plot(sorted_latency, cdf, 'b')
+	plt.xlabel('latency in ms')
+	plt.ylabel('CDF')
+	plt.savefig(savefile)
+
+
 if __name__ == "__main__":
 	filename1 = "latencyTest.txt"
 	filename2 = "latencyTest_linear.txt"
@@ -70,3 +82,7 @@ if __name__ == "__main__":
 
 	# plot comparison graph
 	plotGraphComparison(np.copy(result_ls), np.copy(result_bs))
+
+	# plot cdf graph
+	plotLatencyCDF(result_bs)
+
