@@ -31,17 +31,14 @@ public class TwoHopQueryFn implements StatefulFunction {
 
     @Override
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
-        if (message.is(Types.VERTEX_INIT_TYPE)) {
-            Vertex vertex = message.as(Types.VERTEX_INIT_TYPE);
-//            List<CustomTuple2<Integer,Long>> currentTwoHopNeighbors = getCurrentTwoHopNeighbors(context);
-            updateTwoHopNeighbors(context,vertex);
-        
-        
-        } else if (message.is(Types.Two_Hop_QUERY_TYPE)){
+
+
+            context.send();
             TwoHopQuery hopQuery = message.as(Types.Two_Hop_QUERY_TYPE);
+
             outputResult(context,hopQuery.getVertexId());
 
-        }
+
 
         return context.done();
 
@@ -54,7 +51,7 @@ public class TwoHopQueryFn implements StatefulFunction {
     }
 
     public List<CustomTuple2<Integer, Long>> getCurrentInNeighbors(Context context) {
-        return context.storage().get(IN_NEIGHBORS).orElse(new ArrayList<CustomTuple2<Integer, Long>>());
+        return context.storage().get()
     }
 
 
