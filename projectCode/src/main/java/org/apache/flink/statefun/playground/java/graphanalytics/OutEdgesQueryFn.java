@@ -2,6 +2,7 @@ package org.apache.flink.statefun.playground.java.graphanalytics;
 
 import org.apache.flink.statefun.playground.java.graphanalytics.types.*;
 import org.apache.flink.statefun.sdk.java.*;
+import org.apache.flink.statefun.sdk.java.io.KafkaEgressMessage;
 import org.apache.flink.statefun.sdk.java.message.EgressMessageBuilder;
 import org.apache.flink.statefun.sdk.java.message.Message;
 
@@ -31,7 +32,7 @@ public class OutEdgesQueryFn implements StatefulFunction {
                     .withValueSpecs(OUT_NEIGHBORS)
                     .build();
 
-    static final TypeName EGRESS_TYPE = TypeName.typeNameOf("io.statefun.playground", "egress");
+    static final TypeName EGRESS_TYPE = TypeName.typeNameOf("graph-analytics.io", "egress");
 
     @Override
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
@@ -100,11 +101,11 @@ public class OutEdgesQueryFn implements StatefulFunction {
                 context.storage().get(OUT_NEIGHBORS).orElse(Collections.emptyList());
 
         context.send(
-                EgressMessageBuilder.forEgress(EGRESS_TYPE)
-                        .withCustomType(Types.EGRESS_RECORD_JSON_TYPE,
-                                new EgressRecord("outgoing-edges",
-                                        String.format("The outgoing edges of vertex %s are %s", vertexId, currentOutNeighbors)))
-                        .build()
+            KafkaEgressMessage.forEgress(EGRESS_TYPE)
+                .withTopic("outgoing-edges")
+                .withUtf8Key(String.valueOf(vertexId))
+                .withUtf8Value(String.format("the outgoing edges of vertex %d are %s\n", vertexId, currentOutNeighbors))
+                .build()
         );
     }
 
