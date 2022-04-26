@@ -74,13 +74,13 @@ final class EventsFilterFn implements StatefulFunction {
                         .withCustomType(Types.OUT_EDGES_QUERY_TYPE, outQuery)
                         .build()
         );
-      } else if (request.getTask().equals("GET_TWOHOP_EDGES")){
+      } else if (request.getTask().equals("GET_TWO_HOP_EDGES")){
 
           System.out.println("Fetching TwoHop Edges");
-          TwoHopQuery twoHopQuery = TwoHopQuery.create(request.getSrc(), request.getTimestamp());
+          TwoHopQuery twoHopQuery = TwoHopQuery.create(request.getDst(), request.getTimestamp());
           context.send(
                   MessageBuilder.forAddress(TwoHopQueryFn.TYPE_NAME, String.valueOf(twoHopQuery.getVertexId()))
-                          .withCustomType(Types.Two_Hop_QUERY_TYPE, twoHopQuery)
+                          .withCustomType(Types.TWO_HOP_QUERY_TYPE, twoHopQuery)
                           .build()
           );
       }
