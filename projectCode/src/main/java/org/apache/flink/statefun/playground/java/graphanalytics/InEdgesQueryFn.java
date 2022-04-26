@@ -42,14 +42,14 @@ public class InEdgesQueryFn implements StatefulFunction {
       Vertex vertex = message.as(Types.Add_IN_EDGE_TYPE);
       List<CustomTuple2<Integer, Long>> currentInNeighbors = getCurrentInNeighbors(context);
       updateInNeighbors(context, vertex, currentInNeighbors);
-      updateEdgeAddCount(context);
+      // updateEdgeAddCount(context);
       long timeElapsed = System.currentTimeMillis() - vertex.getStart();
-      System.out.printf("vertex %s processed in-neighbor %s in %s ms\n", vertex.getDst(), vertex.getSrc(), timeElapsed);
+      // System.out.printf("vertex %s processed in-neighbor %s in %s ms\n", vertex.getDst(), vertex.getSrc(), timeElapsed);
       logInNeighbors(vertex.getDst(), context);
-      outputAddLatency(context, vertex.getDst(), timeElapsed);
+      // outputAddLatency(context, vertex.getDst(), timeElapsed);
     } else if (message.is(Types.IN_EDGES_QUERY_TYPE)) {
       InEdgesQuery query = message.as(Types.IN_EDGES_QUERY_TYPE);
-      updateQueryCount(context);
+      // updateQueryCount(context);
       long timeElapsed = System.currentTimeMillis() - query.getStart();
       // the query we are implementing now is simple; it is only asking for all the incoming edges, so we can
       // just return the entire IN_NEIGHBORS list
@@ -121,16 +121,10 @@ public class InEdgesQueryFn implements StatefulFunction {
 
   private void outputAddLatency(Context context, int vertexId, long latency) {
     int edgeCount = context.storage().get(Add_Edge_Count).orElse(0);
-//    context.send(
-//        EgressMessageBuilder.forEgress(EGRESS_TYPE)
-//            .withCustomType(Types.EGRESS_RECORD_JSON_TYPE,
-//                new EgressRecord("add-edge-latency",
-//                    String.format("%d,%d,%d", vertexId, edgeCount, latency)))
-//            .build()
-//    );
     context.send(
         KafkaEgressMessage.forEgress(EGRESS_TYPE)
             .withTopic("add-edge-latency")
+            .withUtf8Key(String.valueOf(vertexId))
             .withUtf8Value(String.format("latency after adding %d edges to vertex %d is %d\n", edgeCount, vertexId, latency))
             .build()
     );
@@ -144,14 +138,6 @@ public class InEdgesQueryFn implements StatefulFunction {
   private void outputResult(Context context, int vertexId) {
     List<CustomTuple2<Integer, Long>> currentInNeighbors =
         context.storage().get(IN_NEIGHBORS).orElse(Collections.emptyList());
-
-//    context.send(
-//        EgressMessageBuilder.forEgress(EGRESS_TYPE)
-//            .withCustomType(Types.EGRESS_RECORD_JSON_TYPE,
-//                new EgressRecord("incoming-edges",
-//                    String.format("The incoming edges of vertex %s are %s", vertexId, currentInNeighbors)))
-//            .build()
-//    );
     context.send(
         KafkaEgressMessage.forEgress(EGRESS_TYPE)
             .withTopic("incoming-edges")

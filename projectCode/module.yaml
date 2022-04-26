@@ -27,13 +27,14 @@ kind: io.statefun.playground.v1/ingress
 spec:
   port: 8090
 ---
-kind: io.statefun.playground.v1/egress
-spec:
-  port: 8091
-  topics:
-    - incoming-edges
-    - outgoing-edges
-    - add-edge-latency
+#kind: io.statefun.playground.v1/egress
+#spec:
+#  port: 8091
+#  topics:
+#    - incoming-edges
+#    - outgoing-edges
+#    - add-edge-latency
+#---
 ---
 kind: io.statefun.kafka.v1/ingress
 spec:
@@ -59,3 +60,7 @@ spec:
   deliverySemantic:
     type: at-least-once
     transactionTimeoutMillis: 15min
+  topics:
+    - add-edge-latency
+    - incoming-edges
+    - outgoing-edges
