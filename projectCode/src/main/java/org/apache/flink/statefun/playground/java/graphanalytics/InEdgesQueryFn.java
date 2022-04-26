@@ -39,7 +39,7 @@ public class InEdgesQueryFn implements StatefulFunction {
       Vertex vertex = message.as(Types.Add_IN_EDGE_TYPE);
       List<CustomTuple2<Integer, Long>> currentInNeighbors = getCurrentInNeighbors(context);
       updateInNeighbors(context, vertex, currentInNeighbors);
-//      logInNeighbors(vertex.getDst(), context);
+      logInNeighbors(vertex.getDst(), context);
     } else if (message.is(Types.IN_EDGES_QUERY_TYPE)) {
       InEdgesQuery query = message.as(Types.IN_EDGES_QUERY_TYPE);
       // the query we are implementing now is simple; it is only asking for all the incoming edges, so we can
