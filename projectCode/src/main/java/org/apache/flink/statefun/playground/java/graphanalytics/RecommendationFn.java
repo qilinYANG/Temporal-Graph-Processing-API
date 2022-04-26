@@ -7,6 +7,7 @@ import org.apache.flink.statefun.sdk.java.message.EgressMessageBuilder;
 import org.apache.flink.statefun.sdk.java.message.Message;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -59,6 +60,11 @@ public class RecommendationFn implements StatefulFunction {
     }
   }
 
+//  private void logInNeighbors(int vertex, Context context) {
+//    List<CustomTuple2<Integer, Long>> currentInNeighbors = context.storage().get(IN_NEIGHBORS).orElse(Collections.emptyList());
+//
+//    System.out.printf("vertex %d currently has these incoming neighbors: %s\n", vertex, currentInNeighbors);
+//  }
 
   private void outputResult(Context context, int vertexId) {
     Set<Integer> recommendSet = getRecommendationSet(context);
