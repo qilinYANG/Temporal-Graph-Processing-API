@@ -3,6 +3,7 @@ package org.apache.flink.statefun.playground.java.graphanalytics;
 import org.apache.flink.statefun.playground.java.graphanalytics.types.*;
 import org.apache.flink.statefun.sdk.java.*;
 import org.apache.flink.statefun.sdk.java.io.KafkaEgressMessage;
+import org.apache.flink.statefun.sdk.java.message.EgressMessageBuilder;
 import org.apache.flink.statefun.sdk.java.message.Message;
 
 import java.util.Collections;
@@ -63,11 +64,12 @@ public class RecommendationFn implements StatefulFunction {
     Set<Integer> recommendSet = getRecommendationSet(context);
 
     context.send(
-        KafkaEgressMessage.forEgress(EGRESS_TYPE)
-            .withTopic("TwoHop-Recommendation")
-            .withUtf8Key(String.valueOf(vertexId))
-            .withUtf8Value(String.format("recommendation for vertex %d: %s\n", vertexId, recommendSet))
-            .build()
+
+            EgressMessageBuilder.forEgress(EGRESS_TYPE)
+                    .withCustomType(Types.EGRESS_RECORD_JSON_TYPE,
+                            new EgressRecord("TwoHop-Recommendation",
+                                    String.format("Recommenddation for vertex %s are %s", vertexId, recommendSet)))
+                    .build()
     );
   }
 }
