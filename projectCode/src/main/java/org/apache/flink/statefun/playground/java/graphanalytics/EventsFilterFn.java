@@ -52,7 +52,7 @@ final class EventsFilterFn implements StatefulFunction {
 
 
         context.send(
-                MessageBuilder.forAddress(TwoHopQueryFn.TYPE_NAME, String.valueOf(v.getDst()))
+                MessageBuilder.forAddress(RecommendationFn.TYPE_NAME, String.valueOf(v.getDst()))
                         .withCustomType(Types.VERTEX_INIT_TYPE, v)
                         .build()
         );
@@ -77,10 +77,10 @@ final class EventsFilterFn implements StatefulFunction {
       } else if (request.getTask().equals("GET_TWO_HOP_EDGES")){
 
           System.out.println("Fetching TwoHop Edges");
-          TwoHopQuery twoHopQuery = TwoHopQuery.create(request.getDst(), request.getTimestamp());
+          RecommendQuery recommendQuery = RecommendQuery.create(request.getDst(), request.getTimestamp());
           context.send(
-                  MessageBuilder.forAddress(TwoHopQueryFn.TYPE_NAME, String.valueOf(twoHopQuery.getVertexId()))
-                          .withCustomType(Types.TWO_HOP_QUERY_TYPE, twoHopQuery)
+                  MessageBuilder.forAddress(RecommendationFn.TYPE_NAME, String.valueOf(recommendQuery.getVertexId()))
+                          .withCustomType(Types.RECOMMEND_QUERY_TYPE, recommendQuery)
                           .build()
           );
       }

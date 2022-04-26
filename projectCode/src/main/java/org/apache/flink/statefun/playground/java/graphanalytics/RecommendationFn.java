@@ -3,17 +3,13 @@ package org.apache.flink.statefun.playground.java.graphanalytics;
 import org.apache.flink.statefun.playground.java.graphanalytics.types.*;
 import org.apache.flink.statefun.sdk.java.*;
 import org.apache.flink.statefun.sdk.java.io.KafkaEgressMessage;
-import org.apache.flink.statefun.sdk.java.message.EgressMessageBuilder;
 import org.apache.flink.statefun.sdk.java.message.Message;
-import org.apache.flink.statefun.sdk.java.message.MessageBuilder;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-public class TwoHopQueryFn implements StatefulFunction {
+public class RecommendationFn implements StatefulFunction {
 
 
 
@@ -25,7 +21,7 @@ public class TwoHopQueryFn implements StatefulFunction {
 
   static final StatefulFunctionSpec SPEC =
       StatefulFunctionSpec.builder(TYPE_NAME)
-          .withSupplier(TwoHopQueryFn::new)
+          .withSupplier(RecommendationFn::new)
           .withValueSpecs(RECOMMEND_SET)
           .build();
 
@@ -35,8 +31,8 @@ public class TwoHopQueryFn implements StatefulFunction {
 
   @Override
   public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
-    if (message.is(Types.TWO_HOP_QUERY_TYPE)){
-      TwoHopQuery query = message.as(Types.TWO_HOP_QUERY_TYPE);
+    if (message.is(Types.RECOMMEND_QUERY_TYPE)){
+      RecommendQuery query = message.as(Types.RECOMMEND_QUERY_TYPE);
       // since we've already stored a set of possible recommendation candidate, we can directly output the result
       outputResult(context, query.getVertexId());
     } else if (message.isInt()) {
