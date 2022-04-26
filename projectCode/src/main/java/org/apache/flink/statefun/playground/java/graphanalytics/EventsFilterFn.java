@@ -27,7 +27,6 @@ final class EventsFilterFn implements StatefulFunction {
   @Override
   public CompletableFuture<Void> apply(Context context, Message message) {
     if (message.is(Types.EXECUTE_TYPE)) {
-      System.out.println("Received Request");
       final Execute request = message.as(Types.EXECUTE_TYPE);
       // record the time the system started processing current event
       long start = System.currentTimeMillis();

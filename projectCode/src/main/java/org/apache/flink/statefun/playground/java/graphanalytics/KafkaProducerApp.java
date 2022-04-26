@@ -47,7 +47,7 @@ public class KafkaProducerApp {
 
             // send message with no key to Kafka broker
             try {
-                producer.send(new ProducerRecord<>(topicName, inputStr[2], jsonString)).get();
+                producer.send(new ProducerRecord<>(topicName, inputStr[0], jsonString)).get();
             }catch(Exception e) {
                 e.printStackTrace();
             }
