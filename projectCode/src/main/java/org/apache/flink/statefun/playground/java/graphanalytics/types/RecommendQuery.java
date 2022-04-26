@@ -2,7 +2,7 @@ package org.apache.flink.statefun.playground.java.graphanalytics.types;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class TwoHopQuery {
+public class RecommendQuery {
 
     @JsonProperty("vertex_id")
     private int vertexId;
@@ -10,14 +10,14 @@ public class TwoHopQuery {
     @JsonProperty("t")
     private long timestamp;
 
-    public TwoHopQuery() {}
+    public RecommendQuery() {}
 
     /**
      * overloaded constructor
      * @param vertexId
      * @param timestamp
      */
-    private TwoHopQuery(int vertexId, long timestamp) {
+    private RecommendQuery(int vertexId, long timestamp) {
         this.vertexId = vertexId;
         this.timestamp = timestamp;
     }
@@ -42,7 +42,7 @@ public class TwoHopQuery {
      * @param timestamp
      * @return InEdgesQuery
      */
-    public static TwoHopQuery create(int vertexId, long timestamp) {
-        return new TwoHopQuery(vertexId, timestamp);
+    public static RecommendQuery create(int vertexId, long timestamp) {
+        return new RecommendQuery(vertexId, timestamp);
     }
 }

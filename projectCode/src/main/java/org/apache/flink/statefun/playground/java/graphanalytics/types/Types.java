@@ -54,13 +54,14 @@ public final class Types {
       );
 
 
-  public static final Type<TwoHopQuery> TWO_HOP_QUERY_TYPE =
+  public static final Type<RecommendQuery> RECOMMEND_QUERY_TYPE =
           SimpleType.simpleImmutableTypeFrom(
-                  TypeName.typeNameOf(TYPES_NAMESPACE, "twoHopQuery"),
+                  TypeName.typeNameOf(TYPES_NAMESPACE, "recommendQuery"),
                   JSON_OBJ_MAPPER::writeValueAsBytes,
-                  bytes -> JSON_OBJ_MAPPER.readValue(bytes, TwoHopQuery.class)
+                  bytes -> JSON_OBJ_MAPPER.readValue(bytes, RecommendQuery.class)
           );
 
+  @SuppressWarnings("unchecked")
   public static final Type<Set<Integer>> RECOMMEND_SET_TYPE =
       SimpleType.simpleImmutableTypeFrom(
           TypeName.typeNameOf(TYPES_NAMESPACE, "recommendSet"),
