@@ -50,3 +50,12 @@ spec:
       valueType: graph-analytics.types/execute
       targets:
         - graph-analytics.fns/filter
+---
+kind: io.statefun.kafka.v1/egress
+spec:
+  id: graph-analytics.io/egress
+  address: broker:29092
+  consumerGroupId: graph-analytics
+  deliverySemantic:
+    type: at-least-once
+    transactionTimeoutMillis: 15min
