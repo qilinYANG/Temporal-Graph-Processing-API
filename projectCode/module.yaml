@@ -46,7 +46,7 @@ spec:
     type: exactly-once
     transactionTimeoutMillis: 15min
   topics:
-    - topic: quickstart
+    - topic: tasks
       valueType: graph-analytics.types/execute
       targets:
         - graph-analytics.fns/filter

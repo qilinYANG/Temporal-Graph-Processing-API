@@ -30,14 +30,15 @@ public class KafkaProducerApp {
 
         // environment variables
         String kafkaAddress = System.getenv("BROKER_ADDRESS") == null ? "localhost" : System.getenv("BROKER_ADDRESS");
-        System.out.println(String.format("KafkaAddress: %s", kafkaAddress));
+        String kafkaPort = System.getenv("BROKER_ADDRESS_PORT") == null ? "9092" : System.getenv("BROKER_ADDRESS_PORT");
+        System.out.println(String.format("%s:%s", kafkaAddress, kafkaPort));
         // Kafka Producer API
         Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, String.format("%s:9092", kafkaAddress));
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, String.format("%s:%s", kafkaAddress, kafkaPort));
         props.put(ProducerConfig.ACKS_CONFIG, "all");
         props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
         Producer<String, String> producer = new KafkaProducer<>(props, new StringSerializer(), new StringSerializer());
-        final String topicName = "quickstart";
+        final String topicName = "tasks";
         while(scFiles.hasNextLine()) {
             // create message
             String[] inputStr = scFiles.nextLine().trim().split(" ");
