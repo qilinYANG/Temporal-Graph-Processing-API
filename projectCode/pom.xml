@@ -20,6 +20,21 @@ under the License.
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <profiles>
+        <profile>
+            <id>web-server</id>
+            <properties>
+                <main.file>GraphAnalyticsAppServer</main.file>
+            </properties>
+        </profile>
+        <profile>
+            <id>kafka-producer</id>
+            <properties>
+                <main.file>KafkaProducerApp</main.file>
+            </properties>
+        </profile>
+    </profiles>
+
     <groupId>org.apache.flink</groupId>
     <artifactId>graph-analytics-functions-app</artifactId>
     <version>3.2.0</version>
@@ -31,6 +46,7 @@ under the License.
         <maven.compiler.target>8</maven.compiler.target>
         <flink.version>1.14.3</flink.version>
         <scala.binary.version>2.12</scala.binary.version>
+        <main.file>GraphAnalyticsAppServer</main.file>
     </properties>
 
     <dependencies>
@@ -68,6 +84,19 @@ under the License.
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- flink connector -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-kafka_2.11</artifactId>
+            <version>1.14.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>3.1.0</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -83,7 +112,7 @@ under the License.
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>org.apache.flink.statefun.playground.java.graphanalytics.GraphAnalyticsAppServer</mainClass>
+                            <mainClass>org.apache.flink.statefun.playground.java.graphanalytics.${main.file}</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -121,6 +150,15 @@ under the License.
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.9.0</version>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>

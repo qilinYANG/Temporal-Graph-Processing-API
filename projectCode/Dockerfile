@@ -17,7 +17,7 @@
 FROM maven:3.6.3-jdk-11 AS builder
 COPY src /usr/src/app/src
 COPY pom.xml /usr/src/app
-RUN mvn -f /usr/src/app/pom.xml clean package
+RUN mvn -f /usr/src/app/pom.xml clean package -P web-server
 
 # ... and run the web server!
 FROM openjdk:8

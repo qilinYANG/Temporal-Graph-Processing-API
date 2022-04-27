@@ -1,6 +1,5 @@
 package org.apache.flink.statefun.playground.java.graphanalytics;
 
-import org.apache.flink.api.common.state.State;
 import org.apache.flink.statefun.playground.java.graphanalytics.types.*;
 import org.apache.flink.statefun.sdk.java.*;
 import org.apache.flink.statefun.sdk.java.message.EgressMessageBuilder;
