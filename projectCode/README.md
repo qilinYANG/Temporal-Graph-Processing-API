@@ -43,36 +43,65 @@ The Kafka is set up according to this [guide](https://developer.confluent.io/qui
 docker exec broker \
 kafka-topics --bootstrap-server broker:29092 \
              --create \
-             --topic quickstart
+             --topic tasks
 ```
+If you have kafka installed on your device, then you can enter this instead:
+```
+kafka-topics --bootstrap-server localhost:9092 \
+             --create \
+             --topic tasks
+```
+<br>
 
 **To write to Kafka:** <br>
 To write message to Kafka topic, we'll done it through kafka-console-producer command line tool. This is good for testing it out but during simulation, we'll be using Kafka Connect/Producer API to read textfiles to send graph edges to Flink Application. For sending single message, we can write the following in the terminal:
 ```
 docker exec --interactive --tty broker \
 kafka-console-producer --bootstrap-server broker:29092 \
-                       --topic quickstart
+                       --topic tasks \
+                       --property parse.key=true \
+                       --property key.separator="|"
+```
+If you have kafka installed on your device, then you can enter this instead:
+```
+kafka-console-producer --bootstrap-server localhost:9092 \
+                       --topic tasks \
+                       --property parse.key=true \
+                       --property key.separator="|"
 ```
 Then you can write messages:
 ```
-this is my first kafka message
-hello world!
-this is my third kafka message. I’m on a roll :-D
+3|{"task": "ADD", "src": "3", "dst": "4", "t": "1254194656"}
+1|{"task": "ADD", "src": "1", "dst": "4", "t": "1254192988"}
 ```
+<br>
 
 **To read messages from Kafka on terminal:**<br>
 To read messages from a "quickstart" topic:
 ```
 docker exec --interactive --tty broker \
 kafka-console-consumer --bootstrap-server broker:29092 \
-                       --topic quickstart \
+                       --topic tasks \
                        --from-beginning
 ```
+
+If you have kafka installed on your device, then you can enter this instead:
+```
+kafka-console-consumer --bootstrap-server localhost:9092 \
+                       --topic tasks \
+                       --from-beginning
+```
+<br>
 
 **To list the topics in Kafka:** <br>
 ```
 docker exec broker \
 kafka-topics --bootstrap-server broker:29092 \
+             --list
+```
+If you have kafka installed on your device, then you can enter this instead:
+```
+kafka-topics --bootstrap-server localhost:9092 \
              --list
 ```
 

@@ -1,6 +1,7 @@
 package org.apache.flink.statefun.playground.java.graphanalytics.types;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * Simple class for unified command type.
@@ -19,13 +20,17 @@ public class Execute {
     @JsonProperty("t")
     private long timestamp;
 
+    @JsonProperty("endTime")
+    private long endTime;
+
     public Execute(){}
 
-    private Execute(String task, int src, int dst, long timestamp) {
+    private Execute(String task, int src, int dst, long timestamp, long endTime) {
         this.task = task;
         this.src = src;
         this.dst = dst;
         this.timestamp = timestamp;
+        this.endTime = endTime;
     }
 
     public String getTask() {
@@ -44,7 +49,11 @@ public class Execute {
         return timestamp;
     }
 
-    public static Execute create(String task, int src, int dst, long timestamp) {
-        return new Execute(task, src, dst, timestamp);
+    public long getEndTime() {
+        return endTime;
+    }
+
+    public static Execute create(String task, int src, int dst, long timestamp, long endTime) {
+        return new Execute(task, src, dst, timestamp, endTime);
     }
 }

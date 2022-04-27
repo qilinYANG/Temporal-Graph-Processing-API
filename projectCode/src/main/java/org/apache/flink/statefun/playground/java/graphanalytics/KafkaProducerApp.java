@@ -42,12 +42,11 @@ public class KafkaProducerApp {
         while(scFiles.hasNextLine()) {
             // create message
             String[] inputStr = scFiles.nextLine().trim().split(" ");
-            String jsonString = String.format("{\"task\": \"ADD\", \"src\": \"%1$s\", \"dst\": \"%2$s\", \"t\": \"%3$s\"}", inputStr[0], inputStr[1], inputStr[2]);
+            String jsonString = String.format("{\"task\": \"ADD\", \"src\": \"%1$s\", \"dst\": \"%2$s\", \"t\": \"%3$s\", \"endTime\": \"0\"}", inputStr[0], inputStr[1], inputStr[2]);
             System.out.println(jsonString);
 
-            // send message with no key to Kafka broker
             try {
-                producer.send(new ProducerRecord<>(topicName, inputStr[2], jsonString)).get();
+                producer.send(new ProducerRecord<>(topicName, inputStr[0], jsonString)).get();
             }catch(Exception e) {
                 e.printStackTrace();
             }

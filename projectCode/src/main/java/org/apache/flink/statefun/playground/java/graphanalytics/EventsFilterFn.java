@@ -1,5 +1,7 @@
 package org.apache.flink.statefun.playground.java.graphanalytics;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.apache.flink.statefun.playground.java.graphanalytics.types.*;
 import org.apache.flink.statefun.sdk.java.Context;
 import org.apache.flink.statefun.sdk.java.StatefulFunction;
@@ -28,7 +30,6 @@ final class EventsFilterFn implements StatefulFunction {
   @Override
   public CompletableFuture<Void> apply(Context context, Message message) {
     if (message.is(Types.EXECUTE_TYPE)) {
-      System.out.println("Received Request");
       final Execute request = message.as(Types.EXECUTE_TYPE);
       // record the time the system started processing current event
       long start = System.currentTimeMillis();
@@ -49,6 +50,13 @@ final class EventsFilterFn implements StatefulFunction {
         context.send(
                 MessageBuilder.forAddress(OutEdgesQueryFn.TYPE_NAME, String.valueOf(v.getSrc()))
                         .withCustomType(Types.Add_OUT_EDGE_TYPE, v)
+                        .build()
+        );
+
+
+        context.send(
+                MessageBuilder.forAddress(RecommendationFn.TYPE_NAME, String.valueOf(v.getDst()))
+                        .withCustomType(Types.VERTEX_INIT_TYPE, v)
                         .build()
         );
       } else if (request.getTask().equals("GET_IN_EDGES")) {
@@ -86,6 +94,15 @@ final class EventsFilterFn implements StatefulFunction {
             .withCustomType(Types.K_HOP_QUERY_TYPE, kHopQuery)
             .build()
         );
+      } else if (request.getTask().equals("GET_RECOMMENDATION")){
+
+          System.out.println("Getting Recommendations");
+          RecommendQuery recommendQuery = RecommendQuery.create(request.getDst(), request.getTimestamp());
+          context.send(
+                  MessageBuilder.forAddress(RecommendationFn.TYPE_NAME, String.valueOf(recommendQuery.getVertexId()))
+                          .withCustomType(Types.RECOMMEND_QUERY_TYPE, recommendQuery)
+                          .build()
+          );
       } else {
         System.out.println("Unknown Query Type");
       }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.flink.statefun.sdk.java.TypeName;
 import org.apache.flink.statefun.sdk.java.types.SimpleType;
@@ -36,12 +37,36 @@ public final class Types {
   public static final Type<Vertex> Add_OUT_EDGE_TYPE = VERTEX_INIT_TYPE;
 
 
-  @SuppressWarnings("unchecked")
+
+//  public static final Type<List<CustomTuple2<Integer, Long>>> TwoHop_NEIGHBORS_TYPE =
+//          SimpleType.simpleImmutableTypeFrom(
+//                  TypeName.typeNameOf(TYPES_NAMESPACE, "TwoHopNeighbors"),
+//                  JSON_OBJ_MAPPER::writeValueAsBytes,
+//                  bytes -> JSON_OBJ_MAPPER.readValue(bytes, new TypeReference<List<CustomTuple2<Integer,Long>>>() {})
+//          );
+
+
   public static final Type<List<CustomTuple2<Integer, Long>>> IN_NEIGHBORS_TYPE =
       SimpleType.simpleImmutableTypeFrom(
           TypeName.typeNameOf(TYPES_NAMESPACE, "inNeighbors"),
           JSON_OBJ_MAPPER::writeValueAsBytes,
           bytes -> JSON_OBJ_MAPPER.readValue(bytes, new TypeReference<List<CustomTuple2<Integer, Long>>>() {})
+      );
+
+
+  public static final Type<RecommendQuery> RECOMMEND_QUERY_TYPE =
+          SimpleType.simpleImmutableTypeFrom(
+                  TypeName.typeNameOf(TYPES_NAMESPACE, "recommendQuery"),
+                  JSON_OBJ_MAPPER::writeValueAsBytes,
+                  bytes -> JSON_OBJ_MAPPER.readValue(bytes, RecommendQuery.class)
+          );
+
+  @SuppressWarnings("unchecked")
+  public static final Type<Set<Integer>> RECOMMEND_SET_TYPE =
+      SimpleType.simpleImmutableTypeFrom(
+          TypeName.typeNameOf(TYPES_NAMESPACE, "recommendSet"),
+          JSON_OBJ_MAPPER::writeValueAsBytes,
+          bytes -> JSON_OBJ_MAPPER.readValue(bytes, Set.class)
       );
 
   public static final Type<InEdgesQuery> IN_EDGES_QUERY_TYPE =
@@ -85,3 +110,4 @@ public final class Types {
           JSON_OBJ_MAPPER::writeValueAsBytes,
           bytes -> JSON_OBJ_MAPPER.readValue(bytes, EgressRecord.class));
 }
+//"io.statefun.playground"

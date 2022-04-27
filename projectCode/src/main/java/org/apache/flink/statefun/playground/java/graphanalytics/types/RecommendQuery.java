@@ -2,11 +2,7 @@ package org.apache.flink.statefun.playground.java.graphanalytics.types;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * This class defines the type of the query for counting the number of outgoing edges of a vertex.
- * The function that is responsible for dispatching queries should send a message of this type to the InEdgesQueryFn.
- */
-public class OutEdgesQuery {
+public class RecommendQuery {
 
     @JsonProperty("vertex_id")
     private int vertexId;
@@ -14,29 +10,29 @@ public class OutEdgesQuery {
     @JsonProperty("t")
     private long timestamp;
 
-    // this variable is only used for latency experiment
-    @JsonProperty("start")
-    private long start;
-
-    public OutEdgesQuery() {}
+    public RecommendQuery() {}
 
     /**
      * overloaded constructor
      * @param vertexId
      * @param timestamp
-     * @param start
      */
-    private OutEdgesQuery(int vertexId, long timestamp, long start) {
+    private RecommendQuery(int vertexId, long timestamp) {
         this.vertexId = vertexId;
         this.timestamp = timestamp;
-        this.start = start;
+    }
+
+    public void setVertexId(int vertexId) {
+        this.vertexId = vertexId;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
     public int getVertexId() { return vertexId; }
 
     public long getTimestamp() { return timestamp; }
-
-    public long getStart() {return start;}
 
     /**
      * This method is used for creating a new InEdgesQuery, please call InEdgesQuery.create(vertex_id, timestamp)
@@ -44,10 +40,9 @@ public class OutEdgesQuery {
      *
      * @param vertexId
      * @param timestamp
-     * @param start
      * @return InEdgesQuery
      */
-    public static OutEdgesQuery create(int vertexId, long timestamp, long start) {
-        return new OutEdgesQuery(vertexId, timestamp, start);
+    public static RecommendQuery create(int vertexId, long timestamp) {
+        return new RecommendQuery(vertexId, timestamp);
     }
 }

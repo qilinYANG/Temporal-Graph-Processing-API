@@ -67,7 +67,7 @@ public class InEdgesQueryFn implements StatefulFunction {
    * @param context
    * @return IN_NEIGHBORS
    */
-  private List<CustomTuple2<Integer, Long>> getCurrentInNeighbors(Context context) {
+  public List<CustomTuple2<Integer, Long>> getCurrentInNeighbors(Context context) {
     return context.storage().get(IN_NEIGHBORS).orElse(new ArrayList<CustomTuple2<Integer, Long>>());
   }
 
@@ -119,7 +119,7 @@ public class InEdgesQueryFn implements StatefulFunction {
    * @param vertex
    * @param currentInNeighbors
    */
-  private void updateInNeighbors(Context context, Vertex vertex, List<CustomTuple2<Integer, Long>> currentInNeighbors) {
+  public void updateInNeighbors(Context context, Vertex vertex, List<CustomTuple2<Integer, Long>> currentInNeighbors) {
     CustomTuple2<Integer, Long> newInNeighbor = CustomTuple2.createTuple2(vertex.getSrc(), vertex.getTimestamp());
     // perform binary search to add incoming neighbor to the correct index, so that the IN_NEIGHBORS list remains
     // sorted by timestamp
