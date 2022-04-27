@@ -3,7 +3,7 @@ package org.apache.flink.statefun.playground.java.graphanalytics.types;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * This class defines the type of the query for counting the number of incoming edges of a vertex.
+ * This class defines the type of the query for counting the number of outgoing edges of a vertex.
  * The function that is responsible for dispatching queries should send a message of this type to the InEdgesQueryFn.
  */
 public class OutEdgesQuery {
