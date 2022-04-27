@@ -74,9 +74,9 @@ final class EventsFilterFn implements StatefulFunction {
                         .withCustomType(Types.OUT_EDGES_QUERY_TYPE, outQuery)
                         .build()
         );
-      } else if (request.getTask().equals("GET_TWO_HOP_EDGES")){
+      } else if (request.getTask().equals("GET_RECOMMENDATION")){
 
-          System.out.println("Fetching TwoHop Edges");
+          System.out.println("Getting Recommendations");
           RecommendQuery recommendQuery = RecommendQuery.create(request.getDst(), request.getTimestamp());
           context.send(
                   MessageBuilder.forAddress(RecommendationFn.TYPE_NAME, String.valueOf(recommendQuery.getVertexId()))

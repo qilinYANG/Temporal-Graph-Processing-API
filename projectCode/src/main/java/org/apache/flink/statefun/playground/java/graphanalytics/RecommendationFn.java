@@ -7,7 +7,9 @@ import org.apache.flink.statefun.sdk.java.message.EgressMessageBuilder;
 import org.apache.flink.statefun.sdk.java.message.Message;
 
 import java.util.Collections;
-import java.util.List;
+
+import java.util.HashSet;
+
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -28,7 +30,9 @@ public class RecommendationFn implements StatefulFunction {
           .build();
 
 
+
     static final TypeName EGRESS_TYPE = TypeName.typeNameOf("io.statefun.playground", "egress");
+
 
 
   @Override
@@ -43,6 +47,7 @@ public class RecommendationFn implements StatefulFunction {
       if (candidate != -1) {
         updateRecommendSet(context, candidate);
       }
+      System.out.println("received recommendation candidate");
     }
     return context.done();
   }
@@ -53,10 +58,11 @@ public class RecommendationFn implements StatefulFunction {
 
   public void updateRecommendSet(Context context, int candidate) {
     Set<Integer> curRecommendSet = getRecommendationSet(context);
+    HashSet<Integer> newRecommendSet = new HashSet<>(curRecommendSet);
     // check if candidate is already in the recommendation set
     if (!curRecommendSet.contains(candidate)) {
-      curRecommendSet.add(candidate);
-      context.storage().set(RECOMMEND_SET, curRecommendSet);
+      newRecommendSet.add(candidate);
+      context.storage().set(RECOMMEND_SET, newRecommendSet);
     }
   }
 
@@ -70,12 +76,11 @@ public class RecommendationFn implements StatefulFunction {
     Set<Integer> recommendSet = getRecommendationSet(context);
 
     context.send(
-
-            EgressMessageBuilder.forEgress(EGRESS_TYPE)
-                    .withCustomType(Types.EGRESS_RECORD_JSON_TYPE,
-                            new EgressRecord("TwoHop-Recommendation",
-                                    String.format("Recommenddation for vertex %s are %s", vertexId, recommendSet)))
-                    .build()
+        EgressMessageBuilder.forEgress(EGRESS_TYPE)
+            .withCustomType(Types.EGRESS_RECORD_JSON_TYPE,
+                new EgressRecord("recommendation",
+                    String.format("recommend %s to vertex %d", recommendSet, vertexId)))
+            .build()
     );
   }
 }
