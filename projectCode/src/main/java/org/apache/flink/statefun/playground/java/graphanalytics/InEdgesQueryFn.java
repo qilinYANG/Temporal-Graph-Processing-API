@@ -5,6 +5,7 @@ import org.apache.flink.statefun.sdk.java.*;
 import org.apache.flink.statefun.sdk.java.io.KafkaEgressMessage;
 import org.apache.flink.statefun.sdk.java.message.EgressMessageBuilder;
 import org.apache.flink.statefun.sdk.java.message.Message;
+import org.apache.flink.statefun.sdk.java.message.MessageBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,6 +55,9 @@ public class InEdgesQueryFn implements StatefulFunction {
       // the query we are implementing now is simple; it is only asking for all the incoming edges, so we can
       // just return the entire IN_NEIGHBORS list
       outputResult(context, query.getVertexId());
+    } else if (message.is(Types.K_HOP_QUERY_TYPE)) {
+      KHopQuery kHopQuery = message.as(Types.K_HOP_QUERY_TYPE);
+      performKHop(context, kHopQuery);
     }
     return context.done();
   }
@@ -65,6 +69,48 @@ public class InEdgesQueryFn implements StatefulFunction {
    */
   private List<CustomTuple2<Integer, Long>> getCurrentInNeighbors(Context context) {
     return context.storage().get(IN_NEIGHBORS).orElse(new ArrayList<CustomTuple2<Integer, Long>>());
+  }
+
+  private void performKHop(Context context, KHopQuery kHopQuery) {
+    System.out.println("Vertex: " + kHopQuery.getVertexId() + " K: " + kHopQuery.getK() + " Current In Neighbors: " + getCurrentInNeighbors(context));
+    List<CustomTuple2<Integer, Long>> currentInNeighbors = getCurrentInNeighbors(context);
+    List<Integer> filteredNodes = new ArrayList<Integer>(0);
+
+    for (int i = 0; i < currentInNeighbors.size(); i++) {
+      CustomTuple2<Integer, Long> node = currentInNeighbors.get(i);
+      int nodeIndex = node.getField(0);
+
+      if (!kHopQuery.getTrace().contains(nodeIndex) && !filteredNodes.contains(nodeIndex)) {
+        filteredNodes.add(nodeIndex);
+      }
+    }
+
+    if (kHopQuery.getN() > 0) {
+      ArrayList<Integer> trace = kHopQuery.getTrace();
+      trace.add(kHopQuery.getCurrentId());
+
+      for (int i = 0; i < filteredNodes.size(); i++) {
+        KHopQuery nextQuery = KHopQuery.create(
+                kHopQuery.getVertexId(),
+                filteredNodes.get(i),
+                kHopQuery.getK(),
+                kHopQuery.getN() - 1,
+                trace,
+                kHopQuery.getStart()
+        );
+
+        context.send(
+          MessageBuilder.forAddress(InEdgesQueryFn.TYPE_NAME, String.valueOf(filteredNodes.get(i)))
+            .withCustomType(Types.K_HOP_QUERY_TYPE, nextQuery)
+            .build()
+        );
+      }
+    } else {
+      for (int i = 0; i < filteredNodes.size(); i++) {
+        System.out.println(String.format("Incoming K-Hop node for vertex %d (K = %d): %d", kHopQuery.getVertexId(), kHopQuery.getK(), filteredNodes.get(i)));
+        outputKHopResult(context, kHopQuery.getVertexId(), kHopQuery.getK(), filteredNodes.get(i));
+      }
+    }
   }
 
   /**
@@ -126,6 +172,22 @@ public class InEdgesQueryFn implements StatefulFunction {
             .withTopic("add-edge-latency")
             .withUtf8Key(String.valueOf(vertexId))
             .withUtf8Value(String.format("latency after adding %d edges to vertex %d is %d\n", edgeCount, vertexId, latency))
+            .build()
+    );
+  }
+
+  /**
+   * This method outputs k-hop query result to egress.
+   * @param context
+   * @param vertexId
+   */
+
+  private void outputKHopResult(Context context, int vertexId, int k, int currentId) {
+    context.send(
+        KafkaEgressMessage.forEgress(EGRESS_TYPE)
+            .withTopic("k-hop-result")
+            .withUtf8Key(String.valueOf(vertexId))
+            .withUtf8Value(String.format("Incoming K-Hop node for vertex %d (K = %d): %d", vertexId, k, currentId))
             .build()
     );
   }

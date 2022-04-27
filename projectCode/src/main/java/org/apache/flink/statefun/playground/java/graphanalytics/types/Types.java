@@ -65,6 +65,13 @@ public final class Types {
                   bytes -> JSON_OBJ_MAPPER.readValue(bytes, OutEdgesQuery.class)
           );
 
+  public static final Type<KHopQuery> K_HOP_QUERY_TYPE =
+          SimpleType.simpleImmutableTypeFrom(
+                  TypeName.typeNameOf(TYPES_NAMESPACE, "kHopQuery"),
+                  JSON_OBJ_MAPPER::writeValueAsBytes,
+                  bytes -> JSON_OBJ_MAPPER.readValue(bytes, KHopQuery.class)
+          );
+
   public static final Type<Execute> EXECUTE_TYPE =
           SimpleType.simpleImmutableTypeFrom(
                   TypeName.typeNameOf(TYPES_NAMESPACE, "execute"),

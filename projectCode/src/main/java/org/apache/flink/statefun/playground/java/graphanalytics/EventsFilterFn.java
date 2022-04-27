@@ -8,6 +8,7 @@ import org.apache.flink.statefun.sdk.java.TypeName;
 import org.apache.flink.statefun.sdk.java.message.Message;
 import org.apache.flink.statefun.sdk.java.message.MessageBuilder;
 
+import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
 
 
@@ -67,6 +68,21 @@ final class EventsFilterFn implements StatefulFunction {
                 MessageBuilder.forAddress(OutEdgesQueryFn.TYPE_NAME, String.valueOf(outQuery.getVertexId()))
                         .withCustomType(Types.OUT_EDGES_QUERY_TYPE, outQuery)
                         .build()
+        );
+      } else if (request.getTask().equals("K_HOP")) {
+        KHopQuery kHopQuery = KHopQuery.create(
+                request.getDst(),
+                request.getDst(),
+                5,
+                5,
+                new ArrayList<Integer>(0),
+                start
+        );
+
+        context.send(
+          MessageBuilder.forAddress(InEdgesQueryFn.TYPE_NAME, String.valueOf(request.getDst()))
+            .withCustomType(Types.K_HOP_QUERY_TYPE, kHopQuery)
+            .build()
         );
       } else {
         System.out.println("Unknown Query Type");
