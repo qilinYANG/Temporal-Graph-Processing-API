@@ -1,5 +1,7 @@
 package org.apache.flink.statefun.playground.java.graphanalytics;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.apache.flink.statefun.playground.java.graphanalytics.types.*;
 import org.apache.flink.statefun.sdk.java.Context;
 import org.apache.flink.statefun.sdk.java.StatefulFunction;
@@ -49,6 +51,13 @@ final class EventsFilterFn implements StatefulFunction {
                         .withCustomType(Types.Add_OUT_EDGE_TYPE, v)
                         .build()
         );
+
+
+        context.send(
+                MessageBuilder.forAddress(RecommendationFn.TYPE_NAME, String.valueOf(v.getDst()))
+                        .withCustomType(Types.VERTEX_INIT_TYPE, v)
+                        .build()
+        );
       } else if (request.getTask().equals("GET_IN_EDGES")) {
         System.out.println("Fetching IN Edges");
         InEdgesQuery inQuery = InEdgesQuery.create(request.getDst(), request.getTimestamp(), start);
@@ -67,7 +76,17 @@ final class EventsFilterFn implements StatefulFunction {
                         .withCustomType(Types.OUT_EDGES_QUERY_TYPE, outQuery)
                         .build()
         );
-      } else {
+      } else if (request.getTask().equals("GET_RECOMMENDATION")){
+
+          System.out.println("Getting Recommendations");
+          RecommendQuery recommendQuery = RecommendQuery.create(request.getDst(), request.getTimestamp());
+          context.send(
+                  MessageBuilder.forAddress(RecommendationFn.TYPE_NAME, String.valueOf(recommendQuery.getVertexId()))
+                          .withCustomType(Types.RECOMMEND_QUERY_TYPE, recommendQuery)
+                          .build()
+          );
+      }
+      else {
         System.out.println("Unknown Query Type");
       }
     }

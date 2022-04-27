@@ -5,10 +5,12 @@ import org.apache.flink.statefun.sdk.java.*;
 import org.apache.flink.statefun.sdk.java.io.KafkaEgressMessage;
 import org.apache.flink.statefun.sdk.java.message.EgressMessageBuilder;
 import org.apache.flink.statefun.sdk.java.message.Message;
+import org.apache.flink.statefun.sdk.java.message.MessageBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -39,6 +41,7 @@ public class OutEdgesQueryFn implements StatefulFunction {
         if (message.is(Types.Add_OUT_EDGE_TYPE)) {
             Vertex vertex = message.as(Types.Add_OUT_EDGE_TYPE);
             List<CustomTuple2<Integer, Long>> currentOutNeighbors = getCurrentOutNeighbors(context);
+            sendRecommendCandidate(context, currentOutNeighbors, vertex.getDst());
             updateOutNeighbors(context, vertex, currentOutNeighbors);
             logOutNeighbors(vertex.getSrc(), context);
         } else if (message.is(Types.OUT_EDGES_QUERY_TYPE)) {
@@ -55,7 +58,7 @@ public class OutEdgesQueryFn implements StatefulFunction {
      * @param context
      * @return IN_NEIGHBORS
      */
-    private List<CustomTuple2<Integer, Long>> getCurrentOutNeighbors(Context context) {
+    public List<CustomTuple2<Integer, Long>> getCurrentOutNeighbors(Context context) {
         return context.storage().get(OUT_NEIGHBORS).orElse(new ArrayList<CustomTuple2<Integer, Long>>());
     }
 
@@ -66,7 +69,7 @@ public class OutEdgesQueryFn implements StatefulFunction {
      * @param vertex
      * @param currentOutNeighbors
      */
-    private void updateOutNeighbors(Context context, Vertex vertex, List<CustomTuple2<Integer, Long>> currentOutNeighbors) {
+    public void updateOutNeighbors(Context context, Vertex vertex, List<CustomTuple2<Integer, Long>> currentOutNeighbors) {
         CustomTuple2<Integer, Long> newOutNeighbor = CustomTuple2.createTuple2(vertex.getDst(), vertex.getTimestamp());
         // perform binary search to add incoming neighbor to the correct index, so that the IN_NEIGHBORS list remains
         // sorted by timestamp
@@ -89,6 +92,33 @@ public class OutEdgesQueryFn implements StatefulFunction {
         }
         currentOutNeighbors.add(insertIdx, newOutNeighbor);
         context.storage().set(OUT_NEIGHBORS, currentOutNeighbors);
+    }
+
+    public void sendRecommendCandidate(Context context, List<CustomTuple2<Integer, Long>> currentOutNeighbors, int vertexId) {
+        // if we have less than or equal to 3 out-neighbors, recommend the new vertex to all 3 of them
+        if (currentOutNeighbors.size() <= 3) {
+            for (CustomTuple2<Integer, Long> neighbor : currentOutNeighbors) {
+                int targetVertex = neighbor.getField(0);
+                context.send(
+                    MessageBuilder.forAddress(RecommendationFn.TYPE_NAME, String.valueOf(targetVertex))
+                        .withValue(vertexId)
+                        .build()
+                );
+            }
+        } else {
+            // if we have more than 3 out-neighbors, randomly choose 3 vertices to recommend new vertex to
+            int range = currentOutNeighbors.size();
+            Random rand = new Random();
+            for (int i = 0; i < 3; i++) {
+                int chosenIdx = rand.nextInt(range);
+                int targetVertex = currentOutNeighbors.get(chosenIdx).getField(0);
+                context.send(
+                    MessageBuilder.forAddress(RecommendationFn.TYPE_NAME, String.valueOf(targetVertex))
+                        .withValue(vertexId)
+                        .build()
+                );
+            }
+        }
     }
 
     /**
@@ -116,7 +146,6 @@ public class OutEdgesQueryFn implements StatefulFunction {
      */
     private void logOutNeighbors(int vertex, Context context) {
         List<CustomTuple2<Integer, Long>> currentOutNeighbors = context.storage().get(OUT_NEIGHBORS).orElse(Collections.emptyList());
-
         System.out.printf("vertex %d currently has these outgoing neighbors: %s\n", vertex, currentOutNeighbors);
     }
 }

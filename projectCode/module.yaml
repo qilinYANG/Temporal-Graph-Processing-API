@@ -64,3 +64,4 @@ spec:
     - add-edge-latency
     - incoming-edges
     - outgoing-edges
+    - recommendation
