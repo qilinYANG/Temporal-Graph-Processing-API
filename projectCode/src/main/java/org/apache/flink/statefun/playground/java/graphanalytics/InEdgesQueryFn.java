@@ -72,7 +72,6 @@ public class InEdgesQueryFn implements StatefulFunction {
   }
 
   private void performKHop(Context context, KHopQuery kHopQuery) {
-    System.out.println("Vertex: " + kHopQuery.getVertexId() + " K: " + kHopQuery.getK() + " Current In Neighbors: " + getCurrentInNeighbors(context));
     List<CustomTuple2<Integer, Long>> currentInNeighbors = getCurrentInNeighbors(context);
     List<Integer> filteredNodes = new ArrayList<Integer>(0);
 

@@ -70,14 +70,16 @@ final class EventsFilterFn implements StatefulFunction {
                         .build()
         );
       } else if (request.getTask().equals("K_HOP")) {
+        System.out.println("Attempting K-Hop");
         KHopQuery kHopQuery = KHopQuery.create(
                 request.getDst(),
                 request.getDst(),
-                5,
-                5,
+                3,
+                3,
                 new ArrayList<Integer>(0),
                 start
         );
+        System.out.println("K-Hop Request Created");
 
         context.send(
           MessageBuilder.forAddress(InEdgesQueryFn.TYPE_NAME, String.valueOf(request.getDst()))

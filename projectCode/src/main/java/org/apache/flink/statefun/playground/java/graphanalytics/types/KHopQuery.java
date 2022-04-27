@@ -13,7 +13,7 @@ public class KHopQuery {
     private int vertexId;
 
     @JsonProperty("current_id")
-    private int current_id;
+    private int currentId;
 
     @JsonProperty("k")
     private int k;
@@ -35,9 +35,9 @@ public class KHopQuery {
      * @param vertexId
      * @param start
      */
-    private KHopQuery(int vertexId, int current_id, int k, int n, ArrayList<Integer> trace, long start) {
+    private KHopQuery(int vertexId, int currentId, int k, int n, ArrayList<Integer> trace, long start) {
         this.vertexId = vertexId;
-        this.current_id = current_id;
+        this.currentId = currentId;
         this.k = k;
         this.n = n;
         this.trace = trace;
@@ -46,7 +46,7 @@ public class KHopQuery {
 
     public int getVertexId() { return vertexId; }
 
-    public int getCurrentId() { return current_id; }
+    public int getCurrentId() { return currentId; }
 
     public int getK() { return k; }
 
@@ -67,7 +67,7 @@ public class KHopQuery {
      * @param start
      * @return KHopQuery
      */
-    public static KHopQuery create(int vertexId, int current_id, int k, int n, ArrayList<Integer> trace, long start) {
-        return new KHopQuery(vertexId, current_id, k, n, trace, start);
+    public static KHopQuery create(int vertexId, int currentId, int k, int n, ArrayList<Integer> trace, long start) {
+        return new KHopQuery(vertexId, currentId, k, n, trace, start);
     }
 }
