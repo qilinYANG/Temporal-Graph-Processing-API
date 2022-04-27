@@ -21,7 +21,7 @@ public class RecommendationFn implements StatefulFunction {
   private static final ValueSpec<Set<Integer>> RECOMMEND_SET =
     ValueSpec.named("recommendSet").withCustomType(Types.RECOMMEND_SET_TYPE);
 
-  static final TypeName TYPE_NAME = TypeName.typeNameOf("graph-analytics.fns", "twoHopEdges");
+  static final TypeName TYPE_NAME = TypeName.typeNameOf("graph-analytics.fns", "recommendation");
 
   static final StatefulFunctionSpec SPEC =
       StatefulFunctionSpec.builder(TYPE_NAME)
@@ -31,7 +31,7 @@ public class RecommendationFn implements StatefulFunction {
 
 
 
-    static final TypeName EGRESS_TYPE = TypeName.typeNameOf("io.statefun.playground", "egress");
+    static final TypeName EGRESS_TYPE = TypeName.typeNameOf("graph-analytics.io", "egress");
 
 
 
@@ -74,12 +74,11 @@ public class RecommendationFn implements StatefulFunction {
 
   private void outputResult(Context context, int vertexId) {
     Set<Integer> recommendSet = getRecommendationSet(context);
-
     context.send(
-        EgressMessageBuilder.forEgress(EGRESS_TYPE)
-            .withCustomType(Types.EGRESS_RECORD_JSON_TYPE,
-                new EgressRecord("recommendation",
-                    String.format("recommend %s to vertex %d", recommendSet, vertexId)))
+        KafkaEgressMessage.forEgress(EGRESS_TYPE)
+            .withTopic("recommendation")
+            .withUtf8Key(String.valueOf(vertexId))
+            .withUtf8Value(String.format("recommend %s to vertex %d\n", recommendSet, vertexId))
             .build()
     );
   }
