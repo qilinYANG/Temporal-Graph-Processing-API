@@ -97,6 +97,20 @@ public final class Types {
                   bytes -> JSON_OBJ_MAPPER.readValue(bytes, KHopQuery.class)
           );
 
+  public static final Type<TriangleQueryTrigger> TRIANGLE_QUERY_TRIGGER_TYPE =
+          SimpleType.simpleImmutableTypeFrom(
+                  TypeName.typeNameOf(TYPES_NAMESPACE, "triangleQueryTrigger"),
+                  JSON_OBJ_MAPPER::writeValueAsBytes,
+                  bytes -> JSON_OBJ_MAPPER.readValue(bytes, TriangleQueryTrigger.class)
+          );      
+          
+  public static final Type<TriangleQueryPass> TRIANGLE_QUERY_PASS_TYPE =
+          SimpleType.simpleImmutableTypeFrom(
+                  TypeName.typeNameOf(TYPES_NAMESPACE, "triangleQueryPass"),
+                  JSON_OBJ_MAPPER::writeValueAsBytes,
+                  bytes -> JSON_OBJ_MAPPER.readValue(bytes, TriangleQueryPass.class)
+          );      
+
   public static final Type<Execute> EXECUTE_TYPE =
           SimpleType.simpleImmutableTypeFrom(
                   TypeName.typeNameOf(TYPES_NAMESPACE, "execute"),

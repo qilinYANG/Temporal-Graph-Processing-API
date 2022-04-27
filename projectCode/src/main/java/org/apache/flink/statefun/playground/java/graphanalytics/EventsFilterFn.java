@@ -109,6 +109,30 @@ final class EventsFilterFn implements StatefulFunction {
             .withCustomType(Types.K_HOP_QUERY_TYPE, kHopQuery)
             .build()
         );
+      } else if (request.getTask().equals("IN_TRIANGLES")) {
+        System.out.println("Searching Triangles for Incoming Edges of Vertex " + request.getDst());
+        TriangleQueryTrigger triangleQueryTrigger = TriangleQueryTrigger.create(
+                request.getDst(),
+                start
+        );
+
+        context.send(
+          MessageBuilder.forAddress(InEdgesQueryFn.TYPE_NAME, String.valueOf(request.getDst()))
+            .withCustomType(Types.TRIANGLE_QUERY_TRIGGER_TYPE, triangleQueryTrigger)
+            .build()
+        );
+      } else if (request.getTask().equals("OUT_TRIANGLES")) {
+        System.out.println("Searching Triangles for Outgoing Edges of Vertex " + request.getSrc());
+        TriangleQueryTrigger triangleQueryTrigger = TriangleQueryTrigger.create(
+                request.getSrc(),
+                start
+        );
+
+        context.send(
+          MessageBuilder.forAddress(OutEdgesQueryFn.TYPE_NAME, String.valueOf(request.getSrc()))
+            .withCustomType(Types.TRIANGLE_QUERY_TRIGGER_TYPE, triangleQueryTrigger)
+            .build()
+        );
       } else if (request.getTask().equals("GET_RECOMMENDATION")){
 
           System.out.println("Getting Recommendations");

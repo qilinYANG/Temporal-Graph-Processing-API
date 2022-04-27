@@ -58,6 +58,12 @@ public class InEdgesQueryFn implements StatefulFunction {
     } else if (message.is(Types.K_HOP_QUERY_TYPE)) {
       KHopQuery kHopQuery = message.as(Types.K_HOP_QUERY_TYPE);
       performKHop(context, kHopQuery);
+    } else if (message.is(Types.TRIANGLE_QUERY_TRIGGER_TYPE)) {
+      TriangleQueryTrigger trigger = message.as(Types.TRIANGLE_QUERY_TRIGGER_TYPE);
+      triggerTriangleQuery(context, trigger);
+    } else if (message.is(Types.TRIANGLE_QUERY_PASS_TYPE)) {
+      TriangleQueryPass pass = message.as(Types.TRIANGLE_QUERY_PASS_TYPE);
+      performTrianglePass(context, pass);
     }
     return context.done();
   }
@@ -69,6 +75,63 @@ public class InEdgesQueryFn implements StatefulFunction {
    */
   public List<CustomTuple2<Integer, Long>> getCurrentInNeighbors(Context context) {
     return context.storage().get(IN_NEIGHBORS).orElse(new ArrayList<CustomTuple2<Integer, Long>>());
+  }
+
+  private void triggerTriangleQuery(Context context, TriangleQueryTrigger trigger) {
+    List<CustomTuple2<Integer, Long>> currentInNeighbors = getCurrentInNeighbors(context);
+    ArrayList<Integer> filteredNodes = new ArrayList<Integer>(0);
+
+    for (int i = 0; i < currentInNeighbors.size(); i++) {
+      CustomTuple2<Integer, Long> node = currentInNeighbors.get(i);
+      int nodeIndex = node.getField(0);
+
+      if (!filteredNodes.contains(nodeIndex)) {
+        filteredNodes.add(nodeIndex);
+      }
+    }
+    
+    for (int i = 0; i < filteredNodes.size(); i++) {
+      int nodeIndex = filteredNodes.get(i);
+
+      TriangleQueryPass pass = TriangleQueryPass.create(
+        trigger.getVertexId(),
+        nodeIndex,
+        filteredNodes,
+        trigger.getStart()
+      );
+
+      context.send(
+          MessageBuilder.forAddress(InEdgesQueryFn.TYPE_NAME, String.valueOf(nodeIndex))
+            .withCustomType(Types.TRIANGLE_QUERY_PASS_TYPE, pass)
+            .build()
+        );
+    }
+  }
+
+  private void performTrianglePass(Context context, TriangleQueryPass pass) {
+    List<CustomTuple2<Integer, Long>> currentInNeighbors = getCurrentInNeighbors(context);
+    ArrayList<Integer> filteredNodes = new ArrayList<Integer>(0);
+    ArrayList<Integer> prevTrace = pass.getTrace();
+
+    for (int i = 0; i < currentInNeighbors.size(); i++) {
+      CustomTuple2<Integer, Long> node = currentInNeighbors.get(i);
+      int nodeIndex = node.getField(0);
+
+      if (!filteredNodes.contains(nodeIndex)) {
+        filteredNodes.add(nodeIndex);
+      }
+    }
+
+    for (int i = 0; i < filteredNodes.size(); i++) {
+      int nodeIndex = filteredNodes.get(i);
+
+      if (prevTrace.contains(nodeIndex)) {
+        System.out.println(String.format("Found Incoming Triangle for Vertex %d: (%d -> %d) (%d -> %d -> %d)", 
+              pass.getVertexId(), nodeIndex, pass.getVertexId(), nodeIndex, pass.getCurrentId(), pass.getVertexId()));
+        
+        outputTriangleResult(context, pass.getVertexId(), pass.getCurrentId(), nodeIndex);
+      }
+    }
   }
 
   private void performKHop(Context context, KHopQuery kHopQuery) {
@@ -171,6 +234,25 @@ public class InEdgesQueryFn implements StatefulFunction {
             .withTopic("add-edge-latency")
             .withUtf8Key(String.valueOf(vertexId))
             .withUtf8Value(String.format("latency after adding %d edges to vertex %d is %d\n", edgeCount, vertexId, latency))
+            .build()
+    );
+  }
+
+  /**
+   * This method outputs Triangle query result to egress.
+   * @param context
+   * @param vertexId
+   * @param currentId
+   * @param neighborId
+   */
+
+  private void outputTriangleResult(Context context, int vertexId, int currentId, int sourceId) {
+    context.send(
+        KafkaEgressMessage.forEgress(EGRESS_TYPE)
+            .withTopic("in-triangle-result")
+            .withUtf8Key(String.valueOf(vertexId))
+            .withUtf8Value(String.format("Found Incoming Triangle for Vertex %d: (%d -> %d) (%d -> %d -> %d)", 
+                vertexId, sourceId, vertexId, sourceId, currentId, vertexId))
             .build()
     );
   }

@@ -33,6 +33,10 @@ public class KHopQuery {
     /**
      * overloaded constructor
      * @param vertexId
+     * @param currentId
+     * @param k
+     * @param n
+     * @param trace
      * @param start
      */
     private KHopQuery(int vertexId, int currentId, int k, int n, ArrayList<Integer> trace, long start) {
