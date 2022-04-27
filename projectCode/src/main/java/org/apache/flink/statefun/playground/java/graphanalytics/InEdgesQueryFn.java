@@ -184,7 +184,7 @@ public class InEdgesQueryFn implements StatefulFunction {
   private void outputKHopResult(Context context, int vertexId, int k, int currentId) {
     context.send(
         KafkaEgressMessage.forEgress(EGRESS_TYPE)
-            .withTopic("k-hop-result")
+            .withTopic("in-k-hop-result")
             .withUtf8Key(String.valueOf(vertexId))
             .withUtf8Value(String.format("Incoming K-Hop node for vertex %d (K = %d): %d", vertexId, k, currentId))
             .build()

@@ -77,20 +77,35 @@ final class EventsFilterFn implements StatefulFunction {
                         .withCustomType(Types.OUT_EDGES_QUERY_TYPE, outQuery)
                         .build()
         );
-      } else if (request.getTask().equals("K_HOP")) {
-        System.out.println("Attempting K-Hop");
+      } else if (request.getTask().equals("IN_K_HOP")) {
+        System.out.println("Attempting K-Hop (K = " + request.getK() + ") for Incoming Edges of Vertex " + request.getDst());
         KHopQuery kHopQuery = KHopQuery.create(
                 request.getDst(),
                 request.getDst(),
-                3,
-                3,
+                request.getK(),
+                request.getK() - 1,
                 new ArrayList<Integer>(0),
                 start
         );
-        System.out.println("K-Hop Request Created");
 
         context.send(
           MessageBuilder.forAddress(InEdgesQueryFn.TYPE_NAME, String.valueOf(request.getDst()))
+            .withCustomType(Types.K_HOP_QUERY_TYPE, kHopQuery)
+            .build()
+        );
+      } else if (request.getTask().equals("OUT_K_HOP")) {
+        System.out.println("Attempting K-Hop (K = " + request.getK() + ") for Outgoing Edges of Vertex " + request.getSrc());
+        KHopQuery kHopQuery = KHopQuery.create(
+                request.getSrc(),
+                request.getSrc(),
+                request.getK(),
+                request.getK() - 1,
+                new ArrayList<Integer>(0),
+                start
+        );
+
+        context.send(
+          MessageBuilder.forAddress(OutEdgesQueryFn.TYPE_NAME, String.valueOf(request.getSrc()))
             .withCustomType(Types.K_HOP_QUERY_TYPE, kHopQuery)
             .build()
         );

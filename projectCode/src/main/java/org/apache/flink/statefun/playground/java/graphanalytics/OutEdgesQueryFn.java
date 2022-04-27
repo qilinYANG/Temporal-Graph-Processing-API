@@ -49,6 +49,9 @@ public class OutEdgesQueryFn implements StatefulFunction {
             // the query we are implementing now is simple; it is only asking for all the incoming edges, so we can
             // just return the entire IN_NEIGHBORS list
             outputResult(context, query.getVertexId());
+        } else if (message.is(Types.K_HOP_QUERY_TYPE)) {
+            KHopQuery kHopQuery = message.as(Types.K_HOP_QUERY_TYPE);
+            performKHop(context, kHopQuery);
         }
         return context.done();
     }
@@ -61,6 +64,47 @@ public class OutEdgesQueryFn implements StatefulFunction {
     public List<CustomTuple2<Integer, Long>> getCurrentOutNeighbors(Context context) {
         return context.storage().get(OUT_NEIGHBORS).orElse(new ArrayList<CustomTuple2<Integer, Long>>());
     }
+
+    private void performKHop(Context context, KHopQuery kHopQuery) {
+        List<CustomTuple2<Integer, Long>> currentInNeighbors = getCurrentOutNeighbors(context);
+        List<Integer> filteredNodes = new ArrayList<Integer>(0);
+    
+        for (int i = 0; i < currentInNeighbors.size(); i++) {
+          CustomTuple2<Integer, Long> node = currentInNeighbors.get(i);
+          int nodeIndex = node.getField(0);
+    
+          if (!kHopQuery.getTrace().contains(nodeIndex) && !filteredNodes.contains(nodeIndex)) {
+            filteredNodes.add(nodeIndex);
+          }
+        }
+    
+        if (kHopQuery.getN() > 0) {
+          ArrayList<Integer> trace = kHopQuery.getTrace();
+          trace.add(kHopQuery.getCurrentId());
+    
+          for (int i = 0; i < filteredNodes.size(); i++) {
+            KHopQuery nextQuery = KHopQuery.create(
+                    kHopQuery.getVertexId(),
+                    filteredNodes.get(i),
+                    kHopQuery.getK(),
+                    kHopQuery.getN() - 1,
+                    trace,
+                    kHopQuery.getStart()
+            );
+    
+            context.send(
+              MessageBuilder.forAddress(OutEdgesQueryFn.TYPE_NAME, String.valueOf(filteredNodes.get(i)))
+                .withCustomType(Types.K_HOP_QUERY_TYPE, nextQuery)
+                .build()
+            );
+          }
+        } else {
+          for (int i = 0; i < filteredNodes.size(); i++) {
+            System.out.println(String.format("Outgoing K-Hop node for vertex %d (K = %d): %d", kHopQuery.getVertexId(), kHopQuery.getK(), filteredNodes.get(i)));
+            outputKHopResult(context, kHopQuery.getVertexId(), kHopQuery.getK(), filteredNodes.get(i));
+          }
+        }
+      }
 
     /**
      * This method update the OUT_NEIGHBORS list by adding a new outgoing neighbor to the list
@@ -119,6 +163,22 @@ public class OutEdgesQueryFn implements StatefulFunction {
                 );
             }
         }
+    }
+
+    /**
+     * This method outputs k-hop query result to egress.
+     * @param context
+     * @param vertexId
+     */
+
+    private void outputKHopResult(Context context, int vertexId, int k, int currentId) {
+    context.send(
+        KafkaEgressMessage.forEgress(EGRESS_TYPE)
+            .withTopic("out-k-hop-result")
+            .withUtf8Key(String.valueOf(vertexId))
+            .withUtf8Value(String.format("Outgoing K-Hop node for vertex %d (K = %d): %d", vertexId, k, currentId))
+            .build()
+        );
     }
 
     /**
