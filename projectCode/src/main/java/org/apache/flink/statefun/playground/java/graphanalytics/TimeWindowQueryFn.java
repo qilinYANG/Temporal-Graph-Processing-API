@@ -2,6 +2,7 @@ package org.apache.flink.statefun.playground.java.graphanalytics;
 
 import org.apache.flink.statefun.playground.java.graphanalytics.types.*;
 import org.apache.flink.statefun.sdk.java.*;
+import org.apache.flink.statefun.sdk.java.io.KafkaEgressMessage;
 import org.apache.flink.statefun.sdk.java.message.EgressMessageBuilder;
 import org.apache.flink.statefun.sdk.java.message.Message;
 
@@ -31,14 +32,14 @@ public class TimeWindowQueryFn implements StatefulFunction {
             .withCustomType(Types.OUT_NEIGHBORS_TYPE);
 
     // type for TimeWindowQuery
-    static final TypeName TYPE_NAME = TypeName.typeNameOf("connected-components.fns", "timeWindow");
+    static final TypeName TYPE_NAME = TypeName.typeNameOf("graph-analytics.fns", "timeWindow");
     static final StatefulFunctionSpec SPEC = StatefulFunctionSpec.builder(TYPE_NAME)
             .withSupplier(TimeWindowQueryFn::new)
             .withValueSpecs(OUT_NEIGHBORS)
             .build();
 
     // egress output
-    static final TypeName EGRESS_TYPE = TypeName.typeNameOf("io.statefun.playground", "egress");
+    static final TypeName EGRESS_TYPE = TypeName.typeNameOf("graph-analytics.io", "egress");
 
     @Override
     public CompletableFuture<Void> apply(Context context, Message message) throws Throwable {
@@ -167,13 +168,15 @@ public class TimeWindowQueryFn implements StatefulFunction {
      * @param vertexId
      */
     private void outputResult(Context context, int vertexId, List<CustomTuple2<Integer, Long>> result) {
+
         context.send(
-                EgressMessageBuilder.forEgress(EGRESS_TYPE)
-                        .withCustomType(Types.EGRESS_RECORD_JSON_TYPE,
-                                new EgressRecord("time-window",
-                                        String.format("The outgoing edges of vertex %s are %s\n", vertexId,
-                                                result)))
-                        .build());
+            KafkaEgressMessage.forEgress(EGRESS_TYPE)
+                .withTopic("time-window")
+                .withUtf8Key(String.valueOf(vertexId))
+                .withUtf8Value(String.format("The outgoing edges of vertex %s are %s\n", vertexId,
+                    result))
+                .build()
+        );
     }
 
     /**

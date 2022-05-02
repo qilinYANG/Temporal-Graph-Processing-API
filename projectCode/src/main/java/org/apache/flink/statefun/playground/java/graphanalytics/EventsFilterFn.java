@@ -46,10 +46,9 @@ final class EventsFilterFn implements StatefulFunction {
             MessageBuilder.forAddress(OutEdgesQueryFn.TYPE_NAME, String.valueOf(v.getSrc()))
                 .withCustomType(Types.Add_OUT_EDGE_TYPE, v)
                 .build());
-
         context.send(
-            MessageBuilder.forAddress(RecommendationFn.TYPE_NAME, String.valueOf(v.getDst()))
-                .withCustomType(Types.VERTEX_INIT_TYPE, v)
+            MessageBuilder.forAddress(TimeWindowQueryFn.TYPE_NAME, String.valueOf(v.getSrc()))
+                .withCustomType(Types.Add_OUT_EDGE_TYPE, v)
                 .build());
       } else if (request.getTask().equals("GET_IN_EDGES")) {
         System.out.println("Fetching IN Edges");

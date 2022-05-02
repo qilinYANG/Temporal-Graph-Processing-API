@@ -65,3 +65,4 @@ spec:
     - incoming-edges
     - outgoing-edges
     - recommendation
+    - time-window
