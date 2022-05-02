@@ -8,6 +8,8 @@ import java.net.URL;
 import java.util.Scanner;
 
 /**
+ * @deprecated
+ * NOTE: This is how we used to send events to ingress, but we don't use this file anymore
  * An app for reading a text file inside the data directory to be sent to the stateful function for edge addition.
  * The app reads each line in text file and recursively send PUT request to the Undertow web server on ConnectedComponentsAppsServer;
  * therefore, the app has to be run in parallel with the docker-compose.

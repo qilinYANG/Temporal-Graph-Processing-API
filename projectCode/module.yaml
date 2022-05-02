@@ -61,8 +61,11 @@ spec:
     type: at-least-once
     transactionTimeoutMillis: 15min
   topics:
-    - add-edge-latency
     - incoming-edges
     - outgoing-edges
+    - out-k-hop-result
+    - out-triangle-result
+    - in-triangle-result
+    - in-k-hop-result
     - recommendation
     - time-window
