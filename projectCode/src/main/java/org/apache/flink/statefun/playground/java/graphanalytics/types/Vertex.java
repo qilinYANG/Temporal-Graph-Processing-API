@@ -13,10 +13,6 @@ public class Vertex {
   @JsonProperty("t")
   private long timestamp;
 
-  // this variable is only used for latency experiment
-  @JsonProperty("start")
-  private long start;
-
   public Vertex() {}
 
   /**
@@ -25,13 +21,11 @@ public class Vertex {
    * @param src
    * @param dst
    * @param timestamp
-   * @param start
    */
-  public Vertex(int src, int dst, long timestamp, long start) {
+  public Vertex(int src, int dst, long timestamp) {
     this.src = src;
     this.dst = dst;
     this.timestamp = timestamp;
-    this.start = start;
   }
 
   public int getSrc() {
@@ -45,6 +39,4 @@ public class Vertex {
   public long getTimestamp() {
     return timestamp;
   }
-
-  public long getStart() { return start; }
 }

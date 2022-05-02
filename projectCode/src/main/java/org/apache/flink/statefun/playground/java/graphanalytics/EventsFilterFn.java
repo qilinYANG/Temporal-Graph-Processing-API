@@ -28,16 +28,13 @@ final class EventsFilterFn implements StatefulFunction {
   public CompletableFuture<Void> apply(Context context, Message message) {
     if (message.is(Types.EXECUTE_TYPE)) {
       final Execute request = message.as(Types.EXECUTE_TYPE);
-      // record the time the system started processing current event
-      long start = System.currentTimeMillis();
 
       if (request.getTask().equals("ADD")) {
         System.out.println("Adding Vertex");
         Vertex v = new Vertex(
             request.getSrc(),
             request.getDst(),
-            request.getTimestamp(),
-            start);
+            request.getTimestamp());
         context.send(
             MessageBuilder.forAddress(InEdgesQueryFn.TYPE_NAME, String.valueOf(v.getDst()))
                 .withCustomType(Types.Add_IN_EDGE_TYPE, v)
@@ -52,7 +49,7 @@ final class EventsFilterFn implements StatefulFunction {
                 .build());
       } else if (request.getTask().equals("GET_IN_EDGES")) {
         System.out.println("Fetching IN Edges");
-        InEdgesQuery inQuery = InEdgesQuery.create(request.getDst(), request.getTimestamp(), start);
+        InEdgesQuery inQuery = InEdgesQuery.create(request.getDst(), request.getTimestamp());
 
         context.send(
             MessageBuilder.forAddress(InEdgesQueryFn.TYPE_NAME, String.valueOf(inQuery.getVertexId()))
@@ -60,7 +57,7 @@ final class EventsFilterFn implements StatefulFunction {
                 .build());
       } else if (request.getTask().equals("GET_OUT_EDGES")) {
         System.out.println("Fetching OUT Edges");
-        OutEdgesQuery outQuery = OutEdgesQuery.create(request.getSrc(), request.getTimestamp(), start);
+        OutEdgesQuery outQuery = OutEdgesQuery.create(request.getSrc(), request.getTimestamp());
 
         context.send(
             MessageBuilder.forAddress(OutEdgesQueryFn.TYPE_NAME, String.valueOf(outQuery.getVertexId()))
@@ -83,8 +80,7 @@ final class EventsFilterFn implements StatefulFunction {
             request.getDst(),
             request.getK(),
             request.getK() - 1,
-            new ArrayList<Integer>(0),
-            start);
+            new ArrayList<Integer>(0));
 
         context.send(
             MessageBuilder.forAddress(InEdgesQueryFn.TYPE_NAME, String.valueOf(request.getDst()))
@@ -98,8 +94,7 @@ final class EventsFilterFn implements StatefulFunction {
             request.getSrc(),
             request.getK(),
             request.getK() - 1,
-            new ArrayList<Integer>(0),
-            start);
+            new ArrayList<Integer>(0));
 
         context.send(
             MessageBuilder.forAddress(OutEdgesQueryFn.TYPE_NAME, String.valueOf(request.getSrc()))
@@ -108,8 +103,7 @@ final class EventsFilterFn implements StatefulFunction {
       } else if (request.getTask().equals("IN_TRIANGLES")) {
         System.out.println("Searching Triangles for Incoming Edges of Vertex " + request.getDst());
         TriangleQueryTrigger triangleQueryTrigger = TriangleQueryTrigger.create(
-            request.getDst(),
-            start);
+            request.getDst());
 
         context.send(
             MessageBuilder.forAddress(InEdgesQueryFn.TYPE_NAME, String.valueOf(request.getDst()))
@@ -118,8 +112,7 @@ final class EventsFilterFn implements StatefulFunction {
       } else if (request.getTask().equals("OUT_TRIANGLES")) {
         System.out.println("Searching Triangles for Outgoing Edges of Vertex " + request.getSrc());
         TriangleQueryTrigger triangleQueryTrigger = TriangleQueryTrigger.create(
-            request.getSrc(),
-            start);
+            request.getSrc());
 
         context.send(
             MessageBuilder.forAddress(OutEdgesQueryFn.TYPE_NAME, String.valueOf(request.getSrc()))

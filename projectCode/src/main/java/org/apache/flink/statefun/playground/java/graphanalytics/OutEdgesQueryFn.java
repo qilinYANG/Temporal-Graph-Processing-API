@@ -90,8 +90,7 @@ public class OutEdgesQueryFn implements StatefulFunction {
           TriangleQueryPass pass = TriangleQueryPass.create(
             trigger.getVertexId(),
             nodeIndex,
-            filteredNodes,
-            trigger.getStart()
+            filteredNodes
           );
     
           context.send(
@@ -151,8 +150,7 @@ public class OutEdgesQueryFn implements StatefulFunction {
                     filteredNodes.get(i),
                     kHopQuery.getK(),
                     kHopQuery.getN() - 1,
-                    trace,
-                    kHopQuery.getStart()
+                    trace
             );
     
             context.send(
@@ -233,7 +231,7 @@ public class OutEdgesQueryFn implements StatefulFunction {
      * @param context
      * @param vertexId
      * @param currentId
-     * @param neighborId
+     * @param destId
      */
 
     private void outputTriangleResult(Context context, int vertexId, int currentId, int destId) {

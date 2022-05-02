@@ -13,9 +13,6 @@ public class TriangleQueryPass {
     @JsonProperty("trace")
     private ArrayList<Integer> trace;
 
-    // this variable is only used for latency experiment
-    @JsonProperty("start")
-    private long start;
 
     public TriangleQueryPass() {}
 
@@ -24,13 +21,11 @@ public class TriangleQueryPass {
      * @param vertexId
      * @param currentId
      * @param trace
-     * @param start
      */
-    private TriangleQueryPass(int vertexId, int currentId, ArrayList<Integer> trace, long start) {
+    private TriangleQueryPass(int vertexId, int currentId, ArrayList<Integer> trace) {
         this.vertexId = vertexId;
         this.currentId = currentId;
         this.trace = trace;
-        this.start = start;
     }
 
     public int getVertexId() { return vertexId; }
@@ -39,8 +34,6 @@ public class TriangleQueryPass {
 
     public ArrayList<Integer> getTrace() { return trace; }
 
-    public long getStart() { return start; }
-
     /**
      * This method is used for creating a new TriangleQueryPass, please call TriangleQueryPass.create(vertex_id, current_id, trace, start)
      * to create an object of this class
@@ -48,10 +41,9 @@ public class TriangleQueryPass {
      * @param vertexId
      * @param currentId
      * @param trace
-     * @param start
      * @return TriangleQueryPass
      */
-    public static TriangleQueryPass create(int vertexId, int currentId, ArrayList<Integer> trace, long start) {
-        return new TriangleQueryPass(vertexId, currentId, trace, start);
+    public static TriangleQueryPass create(int vertexId, int currentId, ArrayList<Integer> trace) {
+        return new TriangleQueryPass(vertexId, currentId, trace);
     }
 }

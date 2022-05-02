@@ -24,9 +24,6 @@ public class KHopQuery {
     @JsonProperty("trace")
     private ArrayList<Integer> trace;
 
-    // this variable is only used for latency experiment
-    @JsonProperty("start")
-    private long start;
 
     public KHopQuery() {}
 
@@ -37,15 +34,13 @@ public class KHopQuery {
      * @param k
      * @param n
      * @param trace
-     * @param start
      */
-    private KHopQuery(int vertexId, int currentId, int k, int n, ArrayList<Integer> trace, long start) {
+    private KHopQuery(int vertexId, int currentId, int k, int n, ArrayList<Integer> trace) {
         this.vertexId = vertexId;
         this.currentId = currentId;
         this.k = k;
         this.n = n;
         this.trace = trace;
-        this.start = start;
     }
 
     public int getVertexId() { return vertexId; }
@@ -58,8 +53,6 @@ public class KHopQuery {
 
     public ArrayList<Integer> getTrace() { return trace; }
 
-    public long getStart() {return start;}
-
     /**
      * This method is used for creating a new KHopQuery, please call KHopQuery.create(vertex_id, timestamp)
      * to create an object of this class
@@ -68,10 +61,9 @@ public class KHopQuery {
      * @param k
      * @param n
      * @param trace
-     * @param start
      * @return KHopQuery
      */
-    public static KHopQuery create(int vertexId, int currentId, int k, int n, ArrayList<Integer> trace, long start) {
-        return new KHopQuery(vertexId, currentId, k, n, trace, start);
+    public static KHopQuery create(int vertexId, int currentId, int k, int n, ArrayList<Integer> trace) {
+        return new KHopQuery(vertexId, currentId, k, n, trace);
     }
 }
