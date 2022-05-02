@@ -20,13 +20,17 @@ public class Execute {
     @JsonProperty("t")
     private long timestamp;
 
+    // this property is for TimeWindowQuery
+    // since it requires start and end time
+    // to create a time window
     @JsonProperty("endTime")
     private long endTime;
 
     @JsonProperty("k")
     private int k;
 
-    public Execute(){}
+    public Execute() {
+    }
 
     private Execute(String task, int src, int dst, long timestamp, long endTime, int k) {
         this.task = task;

@@ -40,6 +40,7 @@ public final class GraphAnalyticsAppServer {
     functions.withStatefulFunction(InEdgesQueryFn.SPEC);
     functions.withStatefulFunction(OutEdgesQueryFn.SPEC);
     functions.withStatefulFunction(RecommendationFn.SPEC);
+    functions.withStatefulFunction(TimeWindowQueryFn.SPEC);
 
     final RequestReplyHandler requestReplyHandler = functions.requestReplyHandler();
     final Undertow httpServer =
