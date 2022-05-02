@@ -4,6 +4,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 
+
+/**
+ * @deprecated
+ * This is a program that automatically retrives latency test results from egress.
+ * Also, this program reads from the old egress, which is not used anymore.
+ */
 public class LatencyTest {
 
 

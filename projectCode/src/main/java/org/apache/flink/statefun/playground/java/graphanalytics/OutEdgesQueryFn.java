@@ -199,6 +199,13 @@ public class OutEdgesQueryFn implements StatefulFunction {
         context.storage().set(OUT_NEIGHBORS, currentOutNeighbors);
     }
 
+  /**
+   * This method sends potential recommendation candidates to the RecommendationFn,
+   * we only choose a maximum of 3 out neighbors to recommend the newly added vertex to
+   * @param context
+   * @param currentOutNeighbors
+   * @param vertexId
+   */
     public void sendRecommendCandidate(Context context, List<CustomTuple2<Integer, Long>> currentOutNeighbors, int vertexId) {
         // if we have less than or equal to 3 out-neighbors, recommend the new vertex to all 3 of them
         if (currentOutNeighbors.size() <= 3) {

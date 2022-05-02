@@ -2,6 +2,10 @@ package org.apache.flink.statefun.playground.java.graphanalytics.types;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * This class defines the type of the query that gets recommendation candidates for a specific vertex
+ * The function that is responsible for dispatching queries should send a message of this type to the RecommendationFn
+ */
 public class RecommendQuery {
 
     @JsonProperty("vertex_id")
