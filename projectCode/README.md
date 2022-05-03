@@ -7,8 +7,14 @@ This is the source code for project 6.
 * `src/.../GraphAnalyticsAppServer.java`: contains the `Undertow` server that listens for requests
 * `src/.../InEdgesQueryFn.java`: contains the query code for counting incoming edges
 * `src/.../OutEdgesQueryFn.java`: contains the query code for counting outgoing edges
-* `src/.../TimeWindowQueryFn.java`: contains the query code for counting outgoing edges of a node within a specified time window
+* `src/.../TimeWindowQueryFn.java`: contains the query code for the time window query. See API for more details.
 * `src/.../EventsFilterFn`: contains the code of our main event handler function, which receives all requests and sends each request to the appropriate query function
+
+# Query Functions API
+* `TimeWindowQueryFn`:
+    * `execute` task type: `GET_TIME_WINDOW_EDGES`
+    * required parameters: `src` for vertex to query on, `t` for starting timestamp, `endTime` for ending timestamp
+    * this query outputs all outgoing edges from source node `src` between time `t` and `endTime`
 
 # Build project
 * from the root directory of the source code, run `cd projectCode` to go into the actual source directory (if you are already inside the `projectCode` directory, you can skip this step)
@@ -19,9 +25,10 @@ This is the source code for project 6.
 # Run project
 We currently have two ingresses, one of them takes `HTTP` requests as input events, the other one takes `Kafka` messages as
 input events. Therefore, we can send events/queries via `CURL` commands or a `Kafka` producer.  
-All executable events are of the `execute` type and follow the following JSON format:  
+**All executable events** are of the `execute` type and follow the following `JSON` format:  
 `{"task": <executable task>, "src": <src vertexid>, "dst": <dst vertexid>, "t": <timestamp>, "endTime": <endtime for time window query>, "k": <number of hops of k hop query>}`  
-Not all of the fields are needed. For example, `endTime` and `k` are specified for specific queries, so you don't need to specify all
+
+**Not** all of the fields are needed. For example, `endTime` and `k` are specified for specific queries, so you don't need to specify all
 the fields when sending events. Check the specific query API for required fields.
 The supported executable tasks are:
 - `ADD`
@@ -33,10 +40,21 @@ The supported executable tasks are:
 - `IN_TRIANGLES`
 - `OUT_TRIANGLES`
 - `GET_RECOMMENDATION`
+
+
 ## Running Queries with HTTP Requests
-To send queries via curl command, see the following example:
+To send queries via curl command, this is the template to us:
 ```bash
-curl -X PUT -H "Content-Type: application/vnd.graph-analytics.types/execute" -d '{"task": "GET_IN_EDGES", "src": 2, "dst": 3, "t": 12344}' localhost:8090/graph-analytics.fns/filter/1
+curl -X PUT -H "Content-Type: application/vnd.graph-analytics.types/execute" -d <execute JSON> localhost:8090/graph-analytics.fns/filter/1
+```
+
+Examples:
+```bash
+# this CURL command will fetch all incoming edges for source vertex 1 at timestamp 123001
+curl -X PUT -H "Content-Type: application/vnd.graph-analytics.types/execute" -d {"task": GET_IN_EDGES, "src": 1, "t": 123001} localhost:8090/graph-analytics.fns/filter/1
+
+# this CURL command will fetch all outgoing edges for source vertex 1 BETWEEN 123001 <= t <= 125001
+curl -X PUT -H "Content-Type: application/vnd.graph-analytics.types/execute" -d {"task": GET_TIME_WINDOW_EDGES), "src": 1, "t": 123001, "endTime": 125001} localhost:8090/graph-analytics.fns/filter/1
 ```
 
 ## Running Queries through Apache Kafka Broker
