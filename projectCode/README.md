@@ -1,6 +1,14 @@
 # Project 6: Temporal Graph Queries and Analysis
 This is the source code for project 6.
 
+# Project Structure and file explanations:
+* `src/` contains all the source code, and `src/.../types` contains the types we use (eg. `CustomTuple2` and `Vertex` classes)
+* `GraphAnalyticsFilesApp.java` contains code to read from an ingress file rather than requiring us to manually input `CURL` commands from the terminal
+* `src/.../GraphAnalyticsAppServer.java`: contains the `Undertow` server that listens for requests
+* `src/.../InEdgbroker:esQueryFn.java`: contains the query code for counting incoming edges
+* `src/.../OutEdgesQueryFn.java`: contains the query code for counting outgoing edges
+* `src/.../EventsFilterFn`: contains the code of our main event handler function
+
 # Build project
 * from the root directory of the source code, run `cd projectCode` to go into the actual source directory (if you are already inside the projectCode directory, you can skip this step)
 * run `make` to build and run the stateful functions
@@ -101,11 +109,3 @@ kafka-topics --bootstrap-server localhost:9092 \
 ```
 docker run -it --rm --network=projectcode_default edenhill/kcat:1.7.1 -b broker:29092 -L
 ```
-
-# Project Structure and file explanations:
-* `src/` contains all the source code, and `src/.../types` contains the types we use (eg. `CustomTuple2` and `Vertex` classes)
-* `GraphAnalyticsFilesApp.java` contains code to read from an ingress file rather than requiring us to manually input `CURL` commands from the terminal
-* `src/.../GraphAnalyticsAppServer.java`: contains the `Undertow` server that listens for requests
-* `src/.../InEdgbroker:esQueryFn.java`: contains the query code for counting incoming edges
-* `src/.../OutEdgesQueryFn.java`: contains the query code for counting outgoing edges
-* `src/.../EventsFilterFn`: contains the code of our main event handler function
