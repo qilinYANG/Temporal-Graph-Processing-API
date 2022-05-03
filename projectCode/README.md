@@ -13,29 +13,30 @@ This is the source code for project 6.
 * from the root directory of the source code, run `cd projectCode` to go into the actual source directory (if you are already inside the projectCode directory, you can skip this step)
 * run `make` to build and run the stateful functions
 * open Docker Desktop and click `graph-analytics` to see messages being sent and received
+* If you prefer reading logs produced by each container in the terminal, run `make kafka-terminal` instead
 
 # Run project
+We currently have two ingresses, one of them takes HTTP requests as input events, the other one takes kafka messages as
+input events. Therefore, we can send events/queries via curl command or kafka producer.  
+All executable events are of the `execute` type and follow the following JSON format:  
+`{"task": <executable task>, "src": <src vertexid>, "dst": <dst vertexid>, "t": <timestamp>, "endTime": <endtime for time range query>, "k": <number of hops of k hop query>}`  
+Not all of the fields are needed. For example, `endTime` and `k` are specified for specific queries, so you don't need to specify all
+the fields when sending events.
+The supported executable tasks are:
+- `ADD`
+- `GET_IN_EDGES`
+- `GET_OUT_EDGES`
+- `GET_TIME_WINDOW_EDGES`
+- `IN_K_HOP`
+- `OUT_K_HOP`
+- `IN_TRIANGLES`
+- `OUT_TRIANGLES`
+- `GET_RECOMMENDATION`
 ## Running Queries with HTTP Requests
-Currently, the queries have to be sent through http requests manually. We will provide easier ways to run queries in the future.
-To retrieve the number of incoming edges of a vertex, send a request like this:
+To send queries via curl command, see the following example:
 ```bash
 curl -X PUT -H "Content-Type: application/vnd.graph-analytics.types/execute" -d '{"task": "GET_IN_EDGES", "src": 2, "dst": 3, "t": 12344}' localhost:8090/graph-analytics.fns/filter/1
 ```
-In the above query, the `src` field will be ignored, and the `dst` field is the vertex the query will be performed on.
-
-To retrieve the number of outgoing edges of a vertex, send a request like this:
-```bash
-curl -X PUT -H "Content-Type: application/vnd.graph-analytics.types/execute" -d '{"task": "GET_OUT_EDGES", "src": 2, "dst": 3, "t": 12344}' localhost:8090/graph-analytics.fns/filter/1
-```
-In the above query, the `dst` field will be ignored, and the `src` field is the vertex the query will be performed on.
-
-__Note__: the timestamp field `t` in both queries has no effect on query results now because we currently do not support time-based queries. We will support it in the future.
-
-Finally, to get the query result from egress, use the following command:
-```bash
-curl -X GET localhost:8091/<query topic>
-```
-The query topic can be `incoming-edges` or `outgoing-edges` depending on what query results you are looking for.
 
 ## Running Queries through Apache Kafka Broker
 The Kafka is set up according to this [guide](https://developer.confluent.io/quickstart/kafka-docker/), which is set up through `docker-compose`; therefore, by running `docker-compose`, it will automatically set up the broker. After `docker-compose up -d`, topics have to be created since at the moment, automatic topics creation during start up is not set up yet. Run the follow commands to manually create topics:
