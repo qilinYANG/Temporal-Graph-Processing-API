@@ -2,26 +2,27 @@
 This is the source code for project 6.
 
 # Project Structure and file explanations:
-* `src/` contains all the source code, and `src/.../types` contains the types we use (eg. `CustomTuple2` and `Vertex` classes)
+* `src/` contains all the source code, and `src/.../types` contains the types we need (eg. `CustomTuple2` and `Vertex` classes) for the different queries
 * `GraphAnalyticsFilesApp.java` contains code to read from an ingress file rather than requiring us to manually input `CURL` commands from the terminal
 * `src/.../GraphAnalyticsAppServer.java`: contains the `Undertow` server that listens for requests
-* `src/.../InEdgbroker:esQueryFn.java`: contains the query code for counting incoming edges
+* `src/.../InEdgesQueryFn.java`: contains the query code for counting incoming edges
 * `src/.../OutEdgesQueryFn.java`: contains the query code for counting outgoing edges
-* `src/.../EventsFilterFn`: contains the code of our main event handler function
+* `src/.../TimeWindowQueryFn.java`: contains the query code for counting outgoing edges of a node within a specified time window
+* `src/.../EventsFilterFn`: contains the code of our main event handler function, which receives all requests and sends each request to the appropriate query function
 
 # Build project
-* from the root directory of the source code, run `cd projectCode` to go into the actual source directory (if you are already inside the projectCode directory, you can skip this step)
+* from the root directory of the source code, run `cd projectCode` to go into the actual source directory (if you are already inside the `projectCode` directory, you can skip this step)
 * run `make` to build and run the stateful functions
-* open Docker Desktop and click `graph-analytics` to see messages being sent and received
+* open `Docker Desktop` and click `graph-analytics` to see messages being sent and received
 * If you prefer reading logs produced by each container in the terminal, run `make kafka-terminal` instead
 
 # Run project
-We currently have two ingresses, one of them takes HTTP requests as input events, the other one takes kafka messages as
-input events. Therefore, we can send events/queries via curl command or kafka producer.  
+We currently have two ingresses, one of them takes `HTTP` requests as input events, the other one takes `Kafka` messages as
+input events. Therefore, we can send events/queries via `CURL` commands or a `Kafka` producer.  
 All executable events are of the `execute` type and follow the following JSON format:  
-`{"task": <executable task>, "src": <src vertexid>, "dst": <dst vertexid>, "t": <timestamp>, "endTime": <endtime for time range query>, "k": <number of hops of k hop query>}`  
+`{"task": <executable task>, "src": <src vertexid>, "dst": <dst vertexid>, "t": <timestamp>, "endTime": <endtime for time window query>, "k": <number of hops of k hop query>}`  
 Not all of the fields are needed. For example, `endTime` and `k` are specified for specific queries, so you don't need to specify all
-the fields when sending events.
+the fields when sending events. Check the specific query API for required fields.
 The supported executable tasks are:
 - `ADD`
 - `GET_IN_EDGES`
