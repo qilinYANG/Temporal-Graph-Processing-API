@@ -76,12 +76,6 @@ Then you can write messages:
 ```
 <br>
 
-Recommendation Query 
-
-```
-{"task": "recommendation", "src": "1", "dst": "2", "t": "1254194656", "k": "0"}
-```
-
 **To read messages from Kafka on terminal:**<br>
 To read messages from a "quickstart" topic:
 ```
