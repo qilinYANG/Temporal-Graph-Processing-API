@@ -1,12 +1,13 @@
-#### Project 6: Temporal Graph Queries and Analysis
+# Project 6: Temporal Graph Queries and Analysis
 This is the source code for project 6.
 
-#### Installation and instructions to run
+# Build project
 * from the root directory of the source code, run `cd projectCode` to go into the actual source directory (if you are already inside the projectCode directory, you can skip this step)
 * run `make` to build and run the stateful functions
 * open Docker Desktop and click `graph-analytics` to see messages being sent and received
 
-#### Running Queries
+# Run project
+## Running Queries with HTTP Requests
 Currently, the queries have to be sent through http requests manually. We will provide easier ways to run queries in the future.
 To retrieve the number of incoming edges of a vertex, send a request like this:
 ```bash
@@ -28,16 +29,7 @@ curl -X GET localhost:8091/<query topic>
 ```
 The query topic can be `incoming-edges` or `outgoing-edges` depending on what query results you are looking for.
 
-
-#### Project Structure and file explanations:
-* `src/` contains all the source code, and `src/.../types` contains the types we use (eg. `CustomTuple2` and `Vertex` classes)
-* `GraphAnalyticsFilesApp.java` contains code to read from an ingress file rather than requiring us to manually input `CURL` commands from the terminal
-* `src/.../GraphAnalyticsAppServer.java`: contains the `Undertow` server that listens for requests
-* `src/.../InEdgbroker:esQueryFn.java`: contains the query code for counting incoming edges
-* `src/.../OutEdgesQueryFn.java`: contains the query code for counting outgoing edges
-* `src/.../EventsFilterFn`: contains the code of our main event handler function
-
-#### Apache Kafka Broker
+## Running Queries through Apache Kafka Broker
 The Kafka is set up according to this [guide](https://developer.confluent.io/quickstart/kafka-docker/), which is set up through `docker-compose`; therefore, by running `docker-compose`, it will automatically set up the broker. After `docker-compose up -d`, topics have to be created since at the moment, automatic topics creation during start up is not set up yet. Run the follow commands to manually create topics:
 ```
 docker exec broker \
@@ -71,8 +63,8 @@ kafka-console-producer --bootstrap-server localhost:9092 \
 ```
 Then you can write messages:
 ```
-3|{"task": "ADD", "src": "3", "dst": "4", "t": "1254194656"}
-1|{"task": "ADD", "src": "1", "dst": "4", "t": "1254192988"}
+3|{"task": "ADD", "src": "3", "dst": "4", "t": "1254194656", "k": "0"}
+1|{"task": "ADD", "src": "1", "dst": "4", "t": "1254192988", "k": "0"}
 ```
 <br>
 
@@ -109,3 +101,11 @@ kafka-topics --bootstrap-server localhost:9092 \
 ```
 docker run -it --rm --network=projectcode_default edenhill/kcat:1.7.1 -b broker:29092 -L
 ```
+
+# Project Structure and file explanations:
+* `src/` contains all the source code, and `src/.../types` contains the types we use (eg. `CustomTuple2` and `Vertex` classes)
+* `GraphAnalyticsFilesApp.java` contains code to read from an ingress file rather than requiring us to manually input `CURL` commands from the terminal
+* `src/.../GraphAnalyticsAppServer.java`: contains the `Undertow` server that listens for requests
+* `src/.../InEdgbroker:esQueryFn.java`: contains the query code for counting incoming edges
+* `src/.../OutEdgesQueryFn.java`: contains the query code for counting outgoing edges
+* `src/.../EventsFilterFn`: contains the code of our main event handler function
