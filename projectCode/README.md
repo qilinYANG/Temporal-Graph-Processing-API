@@ -74,6 +74,11 @@ Then you can write messages:
 3|{"task": "ADD", "src": "3", "dst": "4", "t": "1254194656", "k": "0"}
 1|{"task": "ADD", "src": "1", "dst": "4", "t": "1254192988", "k": "0"}
 ```
+
+Recommendation query:
+```
+{"task": "recommendation", "src": "1", "dst": "2", "t": "1254194656", "k": "0"}
+```
 <br>
 
 **To read messages from Kafka on terminal:**<br>
