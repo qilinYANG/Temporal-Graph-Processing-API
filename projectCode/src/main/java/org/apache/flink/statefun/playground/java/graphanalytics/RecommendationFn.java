@@ -82,11 +82,7 @@ public class RecommendationFn implements StatefulFunction {
     }
   }
 
-//  private void logInNeighbors(int vertex, Context context) {
-//    List<CustomTuple2<Integer, Long>> currentInNeighbors = context.storage().get(IN_NEIGHBORS).orElse(Collections.emptyList());
-//
-//    System.out.printf("vertex %d currently has these incoming neighbors: %s\n", vertex, currentInNeighbors);
-//  }
+
 
   /**
    * This method outputs recommendation query results to egress
