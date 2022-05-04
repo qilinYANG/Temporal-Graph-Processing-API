@@ -3,12 +3,14 @@ This is the source code for project 6.
 
 # Project Structure and file explanations:
 * `src/` contains all the source code, and `src/.../types` contains the types we need (eg. `CustomTuple2` and `Vertex` classes) for the different queries
-* `GraphAnalyticsFilesApp.java` contains code to read from an ingress file rather than requiring us to manually input `CURL` commands from the terminal
+* `src/.../KafkaProducerApp.java` contains code to read from a data file and injects messages to Kafka ingress. This program is run within the `producer` container
 * `src/.../GraphAnalyticsAppServer.java`: contains the `Undertow` server that listens for requests
 * `src/.../InEdgesQueryFn.java`: contains the query code for processing in-edges query, in-k-hop query, and in-triangle query
 * `src/.../OutEdgesQueryFn.java`: contains the query code for processing out-edges query, out-k-hop query, and out-triangle query
 * `src/.../TimeWindowQueryFn.java`: contains the query code for the time window query. See API for more details.
 * `src/.../EventsFilterFn`: contains the code of our main event handler function, which receives all requests and sends each request to the appropriate query function
+* `latencyTest/`: This folder contains the code to generate latency graph and the graphs themselves.
+* `data/`: This folder contains the data files
 
 # Query API
 * `Time Window Query`:
