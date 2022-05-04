@@ -2,40 +2,91 @@
 This is the source code for project 6.
 
 # Project Structure and file explanations:
-* `src/` contains all the source code, and `src/.../types` contains the types we use (eg. `CustomTuple2` and `Vertex` classes)
+* `src/` contains all the source code, and `src/.../types` contains the types we need (eg. `CustomTuple2` and `Vertex` classes) for the different queries
 * `GraphAnalyticsFilesApp.java` contains code to read from an ingress file rather than requiring us to manually input `CURL` commands from the terminal
 * `src/.../GraphAnalyticsAppServer.java`: contains the `Undertow` server that listens for requests
-* `src/.../InEdgbroker:esQueryFn.java`: contains the query code for counting incoming edges
-* `src/.../OutEdgesQueryFn.java`: contains the query code for counting outgoing edges
-* `src/.../EventsFilterFn`: contains the code of our main event handler function
+* `src/.../InEdgesQueryFn.java`: contains the query code for processing in-edges query, in-k-hop query, and in-triangle query
+* `src/.../OutEdgesQueryFn.java`: contains the query code for processing out-edges query, out-k-hop query, and out-triangle query
+* `src/.../TimeWindowQueryFn.java`: contains the query code for the time window query. See API for more details.
+* `src/.../EventsFilterFn`: contains the code of our main event handler function, which receives all requests and sends each request to the appropriate query function
+
+# Query API
+* `Time Window Query`:
+    * `execute` task type: `GET_TIME_WINDOW_EDGES`
+    * required parameters: `src` for vertex to query on, `t` for starting timestamp, `endTime` for ending timestamp
+    * this query outputs all outgoing edges from source node `src` between time `t` and `endTime`
+* `In-Edges Query`:
+  * `execute` task type: `GET_IN_EDGES`
+  * required parameters: `dst` for vertex to query on, `t` for timestamp (currently not used, but required)
+  * this query retrieves all incoming edges of vertex `dst`
+* `Out-Edges Query`:
+  * `execute` task type: `GET_OUT_EDGES`
+  * required parameters: `src` for vertex to query on, `t` for timestamp (currently not used, but required)
+  * this query retrieves all outgoing edges of vertex `src`
+* `IN-K-HOP Query`:
+  * `execute` task type: `IN_K_HOP`
+  * required parameters: `dst` for vertex to query on, `k` for the number of hops
+  * this query retrieves the neighbor that is k hops away from node `dst` by traversing incoming edges
+* `Out-K-HOP Query`:
+  * `execute` task type: `OUT_K_HOP`
+  * required parameters: `src` for vertex to query on, `k` for the number of hops
+  * this query retrieves the neighbor that is k hops away from node `src` by traversing outgoing edges
+* `IN-Triangles Query`
+  * `execute` task type: `IN_TRIANGLES`
+  * required parameters: `dst` for vertex to query on
+  * this query retrieves the nodes within a unidirectional triangle of node `dst` by traversing incoming edges
+* `OUT-Triangles Query`
+  * `execute` task type: `OUT_TRIANGLES`
+  * required parameters: `src` for vertex to query on
+  * this query retrieves the nodes within a unidirectional triangle of node `src` by traversing outgoing edges
+* `Recommendation Query`
+  * `execute` task type: `GET_RECOMMENDATION`
+  * required parameters: `dst` for vertex to query on, `t` for timestamp (currently not used, but required)
+  * this query retrieves the potential recommendation candidates for node `dst` based on outgoing connections of an incoming neighbor of node `dst`
 
 # Build project
-* from the root directory of the source code, run `cd projectCode` to go into the actual source directory (if you are already inside the projectCode directory, you can skip this step)
+* from the root directory of the source code, run `cd projectCode` to go into the actual source directory (if you are already inside the `projectCode` directory, you can skip this step)
 * run `make` to build and run the stateful functions
-* open Docker Desktop and click `graph-analytics` to see messages being sent and received
+* open `Docker Desktop` and click `graph-analytics` to see messages being sent and received
+* If you prefer reading logs produced by each container in the terminal, run `make kafka-terminal` instead
+
+__Important Note__: The zookeeper and Kafka broker container are using arm64 architecture. If you don't have Docker desktop, you might not be able to run it 
+on your local machine, depending on the architecture of your machine. Try using the amd64 version of these containers.
 
 # Run project
+We currently have two ingresses, one of them takes `HTTP` requests as input events, the other one takes `Kafka` messages as
+input events. Therefore, we can send events/queries via `CURL` commands or a `Kafka` producer.  
+**All executable events** are of the `execute` type and follow the following `JSON` format:  
+`{"task": <executable task>, "src": <src vertexid>, "dst": <dst vertexid>, "t": <timestamp>, "endTime": <endtime for time window query>, "k": <number of hops of k hop query>}`  
+
+**Not** all of the fields are needed. For example, `endTime` and `k` are specified for specific queries, so you don't need to specify all
+the fields when sending events. Check the specific query API for required fields.
+The supported executable tasks are:
+- `ADD`
+- `GET_IN_EDGES`
+- `GET_OUT_EDGES`
+- `GET_TIME_WINDOW_EDGES`
+- `IN_K_HOP`
+- `OUT_K_HOP`
+- `IN_TRIANGLES`
+- `OUT_TRIANGLES`
+- `GET_RECOMMENDATION`
+
+
 ## Running Queries with HTTP Requests
-Currently, the queries have to be sent through http requests manually. We will provide easier ways to run queries in the future.
-To retrieve the number of incoming edges of a vertex, send a request like this:
+To send queries via curl command, this is the template to us:
 ```bash
-curl -X PUT -H "Content-Type: application/vnd.graph-analytics.types/execute" -d '{"task": "GET_IN_EDGES", "src": 2, "dst": 3, "t": 12344}' localhost:8090/graph-analytics.fns/filter/1
+curl -X PUT -H "Content-Type: application/vnd.graph-analytics.types/execute" -d <execute JSON> localhost:8090/graph-analytics.fns/filter/1
 ```
-In the above query, the `src` field will be ignored, and the `dst` field is the vertex the query will be performed on.
 
-To retrieve the number of outgoing edges of a vertex, send a request like this:
+Examples:
 ```bash
-curl -X PUT -H "Content-Type: application/vnd.graph-analytics.types/execute" -d '{"task": "GET_OUT_EDGES", "src": 2, "dst": 3, "t": 12344}' localhost:8090/graph-analytics.fns/filter/1
-```
-In the above query, the `dst` field will be ignored, and the `src` field is the vertex the query will be performed on.
+# this CURL command will fetch all incoming edges for source vertex 1 at timestamp 123001
+curl -X PUT -H "Content-Type: application/vnd.graph-analytics.types/execute" -d {"task": GET_IN_EDGES, "src": 1, "t": 123001} localhost:8090/graph-analytics.fns/filter/1
 
-__Note__: the timestamp field `t` in both queries has no effect on query results now because we currently do not support time-based queries. We will support it in the future.
-
-Finally, to get the query result from egress, use the following command:
-```bash
-curl -X GET localhost:8091/<query topic>
+# this CURL command will fetch all outgoing edges for source vertex 1 BETWEEN 123001 <= t <= 125001
+curl -X PUT -H "Content-Type: application/vnd.graph-analytics.types/execute" -d {"task": GET_TIME_WINDOW_EDGES), "src": 1, "t": 123001, "endTime": 125001} localhost:8090/graph-analytics.fns/filter/1
 ```
-The query topic can be `incoming-edges` or `outgoing-edges` depending on what query results you are looking for.
 
 ## Running Queries through Apache Kafka Broker
 The Kafka is set up according to this [guide](https://developer.confluent.io/quickstart/kafka-docker/), which is set up through `docker-compose`; therefore, by running `docker-compose`, it will automatically set up the broker. After `docker-compose up -d`, topics have to be created since at the moment, automatic topics creation during start up is not set up yet. Run the follow commands to manually create topics:
