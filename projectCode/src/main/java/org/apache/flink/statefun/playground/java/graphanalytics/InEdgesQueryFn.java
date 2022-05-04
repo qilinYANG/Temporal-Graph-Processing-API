@@ -71,6 +71,11 @@ public class InEdgesQueryFn implements StatefulFunction {
     return context.storage().get(IN_NEIGHBORS).orElse(new ArrayList<CustomTuple2<Integer, Long>>());
   }
 
+  /**
+   * This function triggers the process for In-Triangles query
+   * @param context
+   * @param trigger
+   */
   private void triggerTriangleQuery(Context context, TriangleQueryTrigger trigger) {
     List<CustomTuple2<Integer, Long>> currentInNeighbors = getCurrentInNeighbors(context);
     ArrayList<Integer> filteredNodes = new ArrayList<Integer>(0);
@@ -101,6 +106,11 @@ public class InEdgesQueryFn implements StatefulFunction {
     }
   }
 
+  /**
+   * This function performs intermediate steps for In-Triangles query
+   * @param context
+   * @param pass
+   */
   private void performTrianglePass(Context context, TriangleQueryPass pass) {
     List<CustomTuple2<Integer, Long>> currentInNeighbors = getCurrentInNeighbors(context);
     ArrayList<Integer> filteredNodes = new ArrayList<Integer>(0);
@@ -127,6 +137,11 @@ public class InEdgesQueryFn implements StatefulFunction {
     }
   }
 
+  /**
+   * This function performs the necessary steps for the In-K-Hop query
+   * @param context
+   * @param kHopQuery
+   */
   private void performKHop(Context context, KHopQuery kHopQuery) {
     List<CustomTuple2<Integer, Long>> currentInNeighbors = getCurrentInNeighbors(context);
     List<Integer> filteredNodes = new ArrayList<Integer>(0);
